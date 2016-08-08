@@ -14,44 +14,44 @@ namespace Quantify.Metrics
         private const long NanosecondsInSecond = 1000000000L;
         private const long TickInterval = TickSeconds * NanosecondsInSecond;
 
-        private readonly AtomicLong count = new AtomicLong(0);
-        private readonly long startTime;
-        private readonly AtomicLong lastTick;
-        private readonly IClock clock;
+        private readonly AtomicLong _count = new AtomicLong(0);
+        private readonly long _startTime;
+        private readonly AtomicLong _lastTick;
+        private readonly IClock _clock;
 
         private readonly IDictionary<int, ExponentiallyWeightedMovingAverage> _movingAverages;
 
         public Meter(IClock clock, int[] movingRateWindowSeconds)
         {
-            this.clock = clock;
-            this.startTime = this.clock.CurrentTimeNanoseconds();
-            this.lastTick = new AtomicLong(startTime);
+            _clock = clock;
+            _startTime = _clock.CurrentTimeNanoseconds();
+            _lastTick = new AtomicLong(_startTime);
 
             _movingAverages = new ReadOnlyDictionary<int, ExponentiallyWeightedMovingAverage>(
                 movingRateWindowSeconds.ToDictionary(x => x, x => new ExponentiallyWeightedMovingAverage(x))
             );
         }
 
-        public void Mark(long count = 1l)
+        public void Mark(long count = 1L)
         {
-            tickIfNecessary();
-            this.count.Add(count);
+            TickIfNecessary();
+            _count.Add(count);
             foreach (var rate in _movingAverages.Values)
             {
                 rate.Update(count);
             }
         }
 
-        private double getMeanRate()
+        private double GetMeanRate()
         {
-            var value = count.Value;
+            var value = _count.Value;
             if (value == 0)
             {
                 return 0.0;
             }
             else
             {
-                double elapsed = (clock.CurrentTimeNanoseconds() - startTime);
+                double elapsed = (_clock.CurrentTimeNanoseconds() - _startTime);
                 return value / elapsed * NanosecondsInSecond;
             }
         }
@@ -62,23 +62,23 @@ namespace Quantify.Metrics
             {
                 var rates = _movingAverages.Select(x => new RateValue(x.Key, x.Value.GetRate()*NanosecondsInSecond))
                     .ToArray();
-                return new MeterValue(count.Value, getMeanRate(), rates);
+                return new MeterValue(_count.Value, GetMeanRate(), rates);
             }
         }
 
-        private void tickIfNecessary()
+        private void TickIfNecessary()
         {
             
-            long oldTick = lastTick.Value;
-            long newTick = clock.CurrentTimeNanoseconds();
-            long age = newTick - oldTick;
+            var oldTick = _lastTick.Value;
+            var newTick = _clock.CurrentTimeNanoseconds();
+            var age = newTick - oldTick;
 
             if (age > TickInterval)
             {
-                long newIntervalStartTick = newTick - age % TickInterval;
-                if (lastTick.CompareAndSet(oldTick, newIntervalStartTick))
+                var newIntervalStartTick = newTick - age % TickInterval;
+                if (_lastTick.CompareAndSet(oldTick, newIntervalStartTick))
                 {
-                    long requiredTicks = age / TickInterval;
+                    var requiredTicks = age / TickInterval;
                     for (long i = 0; i < requiredTicks; i++)
                     {
                         foreach (var rate in _movingAverages.Values)
@@ -107,18 +107,18 @@ namespace Quantify.Metrics
 
     public struct RateValue
     {
-        public int IntervalSeconds { get; }
+        public int WindowSeconds { get; }
         public double Rate { get; }
 
-        public RateValue(int intervalSeconds, double rate)
+        public RateValue(int windowSeconds, double rate)
         {
-            IntervalSeconds = intervalSeconds;
+            WindowSeconds = windowSeconds;
             Rate = rate;
         }
 
         public bool Equals(RateValue other)
         {
-            return IntervalSeconds == other.IntervalSeconds && Rate.Equals(other.Rate);
+            return WindowSeconds == other.WindowSeconds && Rate.Equals(other.Rate);
         }
 
         public override bool Equals(object obj)
@@ -131,13 +131,13 @@ namespace Quantify.Metrics
         {
             unchecked
             {
-                return (IntervalSeconds*397) ^ Rate.GetHashCode();
+                return (WindowSeconds*397) ^ Rate.GetHashCode();
             }
         }
 
         public override string ToString()
         {
-            return $"{{{nameof(IntervalSeconds)}: {IntervalSeconds}, {nameof(Rate)}: {Rate}}}";
+            return $"{{{nameof(WindowSeconds)}: {WindowSeconds}, {nameof(Rate)}: {Rate}}}";
         }
     }
 }

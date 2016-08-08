@@ -109,7 +109,7 @@ namespace Quantify.Tests.Metrics
             for (var i = 0; i < rateIntervals.Length; i++)
             {
                 var rate = value.MovingRates[i];
-                Assert.Equal(rateIntervals[i], rate.IntervalSeconds);
+                Assert.Equal(rateIntervals[i], rate.WindowSeconds);
                 Assert.InRange(rate.Rate, rates[i] - 0.001, rates[i] + 0.001);
             }
         }

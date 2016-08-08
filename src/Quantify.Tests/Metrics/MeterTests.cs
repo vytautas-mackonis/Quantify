@@ -12,6 +12,7 @@ namespace Quantify.Tests.Metrics
     {
         [Theory]
         [InlineData(new[] { 60, 300, 900 })]
+        [InlineData(new[] { 10, 15 })]
         public void InitialMeterHasZeroValues(int[] rates)
         {
             var sut = new Meter(Clock.Default, rates);

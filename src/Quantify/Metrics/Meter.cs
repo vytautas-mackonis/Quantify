@@ -21,18 +21,15 @@ namespace Quantify.Metrics
 
         private readonly IDictionary<int, ExponentiallyWeightedMovingAverage> _movingAverages;
 
-        public Meter(IClock clock)
+        public Meter(IClock clock, int[] movingRateWindowSeconds)
         {
             this.clock = clock;
             this.startTime = this.clock.CurrentTimeNanoseconds();
             this.lastTick = new AtomicLong(startTime);
 
-            _movingAverages = new Dictionary<int, ExponentiallyWeightedMovingAverage>
-            {
-                { 60, ExponentiallyWeightedMovingAverage.oneMinuteEWMA() },
-                { 300, ExponentiallyWeightedMovingAverage.fiveMinuteEWMA() },
-                { 900, ExponentiallyWeightedMovingAverage.fifteenMinuteEWMA() }
-            };
+            _movingAverages = new ReadOnlyDictionary<int, ExponentiallyWeightedMovingAverage>(
+                movingRateWindowSeconds.ToDictionary(x => x, x => new ExponentiallyWeightedMovingAverage(x))
+            );
         }
 
         public void Mark(long count = 1l)
@@ -41,7 +38,7 @@ namespace Quantify.Metrics
             this.count.Add(count);
             foreach (var rate in _movingAverages.Values)
             {
-                rate.update(count);
+                rate.Update(count);
             }
         }
 
@@ -63,7 +60,7 @@ namespace Quantify.Metrics
         {
             get
             {
-                var rates = _movingAverages.Select(x => new RateValue(x.Key, x.Value.getRate()*NanosecondsInSecond))
+                var rates = _movingAverages.Select(x => new RateValue(x.Key, x.Value.GetRate()*NanosecondsInSecond))
                     .ToArray();
                 return new MeterValue(count.Value, getMeanRate(), rates);
             }
@@ -86,7 +83,7 @@ namespace Quantify.Metrics
                     {
                         foreach (var rate in _movingAverages.Values)
                         {
-                            rate.tick();
+                            rate.Tick();
                         }
                     }
                 }

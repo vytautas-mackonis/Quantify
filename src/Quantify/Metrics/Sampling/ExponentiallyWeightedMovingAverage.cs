@@ -7,104 +7,60 @@ namespace Quantify.Metrics.Sampling
 {
     public class ExponentiallyWeightedMovingAverage
     {
-        private const int INTERVAL = 5;
-        private const double SECONDS_PER_MINUTE = 60.0;
-        private const int ONE_MINUTE = 1;
-        private const int FIVE_MINUTES = 5;
-        private const int FIFTEEN_MINUTES = 15;
-        private static readonly double M1_ALPHA = 1 - Math.Exp(-INTERVAL / SECONDS_PER_MINUTE / ONE_MINUTE);
-        private static readonly double M5_ALPHA = 1 - Math.Exp(-INTERVAL / SECONDS_PER_MINUTE / FIVE_MINUTES);
-        private static readonly double M15_ALPHA = 1 - Math.Exp(-INTERVAL / SECONDS_PER_MINUTE / FIFTEEN_MINUTES);
+        private const int Interval = 5;
 
-        private volatile bool initialized = false;
-        private volatile ValueHolder<double> rate = new ValueHolder<double>(0.0);
+        private volatile bool _initialized = false;
+        private volatile ValueHolder<double> _rate = new ValueHolder<double>(0.0);
 
-        private readonly AtomicLong uncounted = new AtomicLong(0);
-        private readonly double alpha, interval;
+        private readonly AtomicLong _uncounted = new AtomicLong(0);
+        private readonly double _alpha, _interval;
 
-        /**
-         * Creates a new EWMA which is equivalent to the UNIX one minute load average and which expects
-         * to be ticked every 5 seconds.
-         *
-         * @return a one-minute EWMA
-         */
-        public static ExponentiallyWeightedMovingAverage oneMinuteEWMA()
+        private static double AlphaFor(int windowSeconds, int tickIntervalSeconds)
         {
-            return new ExponentiallyWeightedMovingAverage(M1_ALPHA, INTERVAL);
+            return 1 - Math.Exp(-tickIntervalSeconds / (double)windowSeconds);
         }
 
-        /**
-         * Creates a new EWMA which is equivalent to the UNIX five minute load average and which expects
-         * to be ticked every 5 seconds.
-         *
-         * @return a five-minute EWMA
-         */
-        public static ExponentiallyWeightedMovingAverage fiveMinuteEWMA()
+        public ExponentiallyWeightedMovingAverage(int windowIntervalSeconds)
+            : this(windowIntervalSeconds, Interval)
         {
-            return new ExponentiallyWeightedMovingAverage(M5_ALPHA, INTERVAL);
+
         }
 
-        /**
-         * Creates a new EWMA which is equivalent to the UNIX fifteen minute load average and which
-         * expects to be ticked every 5 seconds.
-         *
-         * @return a fifteen-minute EWMA
-         */
-        public static ExponentiallyWeightedMovingAverage fifteenMinuteEWMA()
+        public ExponentiallyWeightedMovingAverage(int windowIntervalSeconds, int tickIntervalSeconds)
+            : this(AlphaFor(windowIntervalSeconds, tickIntervalSeconds), tickIntervalSeconds)
         {
-            return new ExponentiallyWeightedMovingAverage(M15_ALPHA, INTERVAL);
+
         }
 
-        /**
-         * Create a new EWMA with a specific smoothing constant.
-         *
-         * @param alpha        the smoothing constant
-         * @param interval     the expected tick interval
-         * @param intervalUnit the time unit of the tick interval
-         */
-        public ExponentiallyWeightedMovingAverage(double alpha, long interval)
+        public ExponentiallyWeightedMovingAverage(double alpha, int tickIntervalSeconds)
         {
-            this.interval = interval*1000000000L;
-            this.alpha = alpha;
+            this._interval = tickIntervalSeconds*1000000000L;
+            this._alpha = alpha;
         }
 
-        /**
-         * Update the moving average with a new value.
-         *
-         * @param n the new value
-         */
-        public void update(long n)
+        public void Update(long n)
         {
-            uncounted.Add(n);
+            _uncounted.Add(n);
         }
 
-        /**
-         * Mark the passage of time and decay the current rate accordingly.
-         */
-        public void tick()
+        public void Tick()
         {
-            long count = uncounted.GetAndReset();
-            double instantRate = count / interval;
-            if (initialized)
+            long count = _uncounted.GetAndReset();
+            double instantRate = count / _interval;
+            if (_initialized)
             {
-                rate = new ValueHolder<double>(rate.Value + (alpha * (instantRate - rate.Value)));
+                _rate = new ValueHolder<double>(_rate.Value + (_alpha * (instantRate - _rate.Value)));
             }
             else
             {
-                rate = new ValueHolder<double>(instantRate);
-                initialized = true;
+                _rate = new ValueHolder<double>(instantRate);
+                _initialized = true;
             }
         }
 
-        /**
-         * Returns the rate in the given units of time.
-         *
-         * @param rateUnit the unit of time
-         * @return the rate
-         */
-        public double getRate()
+        public double GetRate()
         {
-            return rate.Value;
+            return _rate.Value;
         }
     }
 }

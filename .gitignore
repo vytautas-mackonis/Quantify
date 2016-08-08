@@ -1,0 +1,14 @@
+.suo
+_NCrunch_*
+*.ncrunchsolution.user
+*.ncrunchsolution
+.vs/*
+*.dll
+[Bb]in
+[Dd]ebug*/
+obj/
+[Rr]elease*/
+_ReSharper*/
+project.lock.json
+*.ncrunchproject
+*.user

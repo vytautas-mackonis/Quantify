@@ -8,7 +8,7 @@ using Quantify.Metrics.Time;
 
 namespace Quantify.Metrics
 {
-    public class Meter
+    public class Meter : IMetric
     {
         private const int TickSeconds = 5;
         private const long NanosecondsInSecond = 1000000000L;
@@ -56,16 +56,6 @@ namespace Quantify.Metrics
             }
         }
 
-        public MeterValue Value
-        {
-            get
-            {
-                var rates = _movingAverages.Select(x => new RateValue(x.Key, x.Value.GetRate()*NanosecondsInSecond))
-                    .ToArray();
-                return new MeterValue(_count.Value, GetMeanRate(), rates);
-            }
-        }
-
         private void TickIfNecessary()
         {
             
@@ -88,6 +78,13 @@ namespace Quantify.Metrics
                     }
                 }
             }
+        }
+
+        public void Accept(IMetricVisitor visitor)
+        {
+            var rates = _movingAverages.Select(x => new RateValue(x.Key, x.Value.GetRate() * NanosecondsInSecond))
+                .ToArray();
+            visitor.Visit(new MeterValue(_count.Value, GetMeanRate(), rates));
         }
     }
 

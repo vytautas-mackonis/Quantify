@@ -16,7 +16,7 @@ namespace Quantify.Tests.Metrics
         {
             var sut = new Meter(Clock.Default, rates);
         
-            var value = sut.Value;
+            var value = sut.Value();
         
             Assert.Equal(0, value.Count);
             Assert.Equal(0, value.MeanRate);
@@ -33,7 +33,7 @@ namespace Quantify.Tests.Metrics
             var sut = new Meter(Clock.Default, new [] { 60 });
             sut.Mark(count);
         
-            var value = sut.Value;
+            var value = sut.Value();
         
             Assert.Equal(count, value.Count);
         }
@@ -49,7 +49,7 @@ namespace Quantify.Tests.Metrics
                 sut.Mark(markValue);
             }
         
-            var value = sut.Value;
+            var value = sut.Value();
         
             Assert.Equal(expectedCount, value.Count);
         }
@@ -66,7 +66,7 @@ namespace Quantify.Tests.Metrics
             clock.AdvanceSeconds(seconds);
             sut.Mark(count);
         
-            var value = sut.Value;
+            var value = sut.Value();
         
             Assert.Equal(mean, value.MeanRate);
         }
@@ -86,7 +86,7 @@ namespace Quantify.Tests.Metrics
                 sut.Mark(meterValues[i]);
             }
         
-            var value = sut.Value;
+            var value = sut.Value();
         
             Assert.Equal(mean, value.MeanRate);
         }
@@ -101,7 +101,7 @@ namespace Quantify.Tests.Metrics
             clock.AdvanceSeconds(10);
             sut.Mark(2);
 
-            var value = sut.Value;
+            var value = sut.Value();
             Assert.Equal(rateIntervals.Length, value.MovingRates.Length);
 
             var rates = new[] {0.1840, 0.1966, 0.1988};

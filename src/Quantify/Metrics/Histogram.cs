@@ -7,7 +7,7 @@ using Quantify.Metrics.Sampling;
 
 namespace Quantify.Metrics
 {
-    public class Histogram<T>
+    public class Histogram<T> : IMetric
         where T : struct, IComparable
     {
         private readonly IReservoir<T> _reservoir;
@@ -26,7 +26,10 @@ namespace Quantify.Metrics
             _reservoir.Mark(value);
         }
 
-        public HistogramValue<T> Value { get { return new HistogramValue<T>(_reservoir.GetSamples(), _lastValue.Value, _percentiles); } }
+        public void Accept(IMetricVisitor visitor)
+        {
+            visitor.Visit(new HistogramValue<T>(_reservoir.GetSamples(), _lastValue.Value, _percentiles));
+        }
     }
 
     public class HistogramValue<T>

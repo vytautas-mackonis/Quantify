@@ -26,14 +26,14 @@ namespace Quantify.Tests.Metrics
         [Fact]
         public void GaugeReturnsValueFromSuppliedFunction()
         {
-            Assert.Equal(ExampleValues[0], _sut.Value.Value);
+            Assert.Equal(ExampleValues[0], _sut.Value().Value);
         }
 
         [Fact]
         public void GaugeQueriesSuppliedFunctionEveryTime()
         {
-            var unused = _sut.Value;
-            Assert.Equal(ExampleValues[1], _sut.Value.Value);
+            var unused = _sut.Value();
+            Assert.Equal(ExampleValues[1], _sut.Value().Value);
         }
 
         protected abstract T[] ExampleValues { get; }

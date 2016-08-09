@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Quantify.Metrics
 {
-    public class Gauge<T>
+    public class Gauge<T> : IMetric
         where T: struct
     {
         private readonly Func<T> _valueAccessor;
@@ -16,7 +16,10 @@ namespace Quantify.Metrics
             _valueAccessor = valueAccessor;
         }
 
-        public GaugeValue<T> Value => new GaugeValue<T>(_valueAccessor());
+        public void Accept(IMetricVisitor visitor)
+        {
+            visitor.Visit(new GaugeValue<T>(_valueAccessor()));
+        }
     }
 
     public class GaugeValue<T>

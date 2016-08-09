@@ -7,7 +7,7 @@ using Quantify.Metrics.Time;
 
 namespace Quantify.Metrics
 {
-    public class Timer
+    public class Timer: IMetric
     {
         private readonly IClock _clock;
         private readonly Meter _rateMeter;
@@ -28,8 +28,6 @@ namespace Quantify.Metrics
         {
             return new Context(this);
         }
-
-        public TimerValue Value => new TimerValue(_rateMeter.Value, _errorRateMeter.Value, _latencyHistogram.Value, _currentlyExecutingCounter.Value);
 
         public interface IContext : IDisposable
         {
@@ -63,6 +61,48 @@ namespace Quantify.Metrics
             public void MarkError()
             {
                 _error = true;
+            }
+        }
+
+        public void Accept(IMetricVisitor visitor)
+        {
+            var valueVisitor = new TimerValueCollectingMetricVisitor();
+            _currentlyExecutingCounter.Accept(valueVisitor);
+            _rateMeter.Accept(valueVisitor);
+            _errorRateMeter.Accept(valueVisitor);
+            _latencyHistogram.Accept(valueVisitor);
+            visitor.Visit(valueVisitor.Value);
+        }
+
+        private class TimerValueCollectingMetricVisitor : IMetricVisitor
+        {
+            private readonly List<MeterValue> _meters = new List<MeterValue>(2);
+            private HistogramValue<long> _latency;
+            private CounterValue _currentlyExecuting;
+
+            public TimerValue Value => new TimerValue(_meters[0], _meters[1], _latency, _currentlyExecuting);
+
+            public void Visit(CounterValue metric)
+            {
+                _currentlyExecuting = metric;
+            }
+
+            public void Visit<T>(GaugeValue<T> metric) where T : struct
+            {
+            }
+
+            public void Visit<T>(HistogramValue<T> metric) where T : struct, IComparable
+            {
+                _latency = (HistogramValue<long>) (object) metric;
+            }
+
+            public void Visit(MeterValue metric)
+            {
+                _meters.Add(metric);
+            }
+
+            public void Visit(TimerValue metric)
+            {
             }
         }
     }

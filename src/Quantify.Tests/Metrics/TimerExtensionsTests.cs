@@ -16,11 +16,11 @@ namespace Quantify.Tests.Metrics
         {
             _sut.Time(() =>
             {
-                Assert.Equal(1, _sut.Value.CurrentlyExecuting.Count);
+                Assert.Equal(1, _sut.Value().CurrentlyExecuting.Count);
             });
 
-            Assert.Equal(0, _sut.Value.CurrentlyExecuting.Count);
-            Assert.Equal(1, _sut.Value.Rate.Count);
+            Assert.Equal(0, _sut.Value().CurrentlyExecuting.Count);
+            Assert.Equal(1, _sut.Value().Rate.Count);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Quantify.Tests.Metrics
         {
             Assert.Throws<Exception>(() => _sut.Time(() => { throw new Exception(); }));
 
-            var value = _sut.Value;
+            var value = _sut.Value();
             Assert.Equal(1, value.ErrorRate.Count);
             Assert.Equal(1, value.Rate.Count);
         }
@@ -47,12 +47,12 @@ namespace Quantify.Tests.Metrics
         {
             await _sut.TimeAsync(() =>
             {
-                Assert.Equal(1, _sut.Value.CurrentlyExecuting.Count);
+                Assert.Equal(1, _sut.Value().CurrentlyExecuting.Count);
                 return Task.CompletedTask;
             });
 
-            Assert.Equal(0, _sut.Value.CurrentlyExecuting.Count);
-            Assert.Equal(1, _sut.Value.Rate.Count);
+            Assert.Equal(0, _sut.Value().CurrentlyExecuting.Count);
+            Assert.Equal(1, _sut.Value().Rate.Count);
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Quantify.Tests.Metrics
         {
             await Assert.ThrowsAsync<Exception>(() => _sut.TimeAsync(() => { throw new Exception(); }));
 
-            var value = _sut.Value;
+            var value = _sut.Value();
             Assert.Equal(1, value.ErrorRate.Count);
             Assert.Equal(1, value.Rate.Count);
         }
@@ -85,12 +85,12 @@ namespace Quantify.Tests.Metrics
         {
             _sut.Time(() =>
             {
-                Assert.Equal(1, _sut.Value.CurrentlyExecuting.Count);
+                Assert.Equal(1, _sut.Value().CurrentlyExecuting.Count);
                 return true;
             });
 
-            Assert.Equal(0, _sut.Value.CurrentlyExecuting.Count);
-            Assert.Equal(1, _sut.Value.Rate.Count);
+            Assert.Equal(0, _sut.Value().CurrentlyExecuting.Count);
+            Assert.Equal(1, _sut.Value().Rate.Count);
         }
 
         [Fact]
@@ -114,7 +114,7 @@ namespace Quantify.Tests.Metrics
                 return true;
             }));
 
-            var value = _sut.Value;
+            var value = _sut.Value();
             Assert.Equal(1, value.ErrorRate.Count);
             Assert.Equal(1, value.Rate.Count);
         }
@@ -133,12 +133,12 @@ namespace Quantify.Tests.Metrics
         {
             await _sut.TimeAsync(() =>
             {
-                Assert.Equal(1, _sut.Value.CurrentlyExecuting.Count);
+                Assert.Equal(1, _sut.Value().CurrentlyExecuting.Count);
                 return Task.FromResult(true);
             });
 
-            Assert.Equal(0, _sut.Value.CurrentlyExecuting.Count);
-            Assert.Equal(1, _sut.Value.Rate.Count);
+            Assert.Equal(0, _sut.Value().CurrentlyExecuting.Count);
+            Assert.Equal(1, _sut.Value().Rate.Count);
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace Quantify.Tests.Metrics
                 return Task.FromResult(true);
             }));
 
-            var value = _sut.Value;
+            var value = _sut.Value();
             Assert.Equal(1, value.ErrorRate.Count);
             Assert.Equal(1, value.Rate.Count);
         }

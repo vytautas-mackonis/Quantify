@@ -20,7 +20,7 @@ namespace Quantify.Tests.Metrics
         {
             var sut = new Timer(Clock.Default, new ExponentiallyDecayingReservoir<long>(), percentiles.Select(x => (decimal)x).ToArray(), movingRateDurations);
 
-            var value = sut.Value;
+            var value = sut.Value();
             Assert.NotNull(value);
             
 
@@ -77,7 +77,7 @@ namespace Quantify.Tests.Metrics
                 }
             }
 
-            var value = sut.Value;
+            var value = sut.Value();
             var latencies = value.Latencies;
             Assert.Equal(timings.Length, latencies.Count);
             Assert.Equal(timings.Last(), latencies.LastValue);
@@ -110,7 +110,7 @@ namespace Quantify.Tests.Metrics
                 clock.AdvanceSeconds(seconds);
             }
 
-            var value = sut.Value;
+            var value = sut.Value();
 
             var rate = value.Rate;
             Assert.Equal(secondsBetweenTimes.Length, rate.Count);
@@ -146,7 +146,7 @@ namespace Quantify.Tests.Metrics
                 clock.AdvanceSeconds(seconds);
             }
 
-            var value = sut.Value;
+            var value = sut.Value();
 
             var rate = value.ErrorRate;
             Assert.Equal(secondsBetweenTimes.Length, rate.Count);
@@ -171,7 +171,7 @@ namespace Quantify.Tests.Metrics
             {
             }
 
-            var value = sut.Value;
+            var value = sut.Value();
             Assert.Equal(0, value.ErrorRate.Count);
         }
 
@@ -185,7 +185,7 @@ namespace Quantify.Tests.Metrics
                 context.MarkError();
             }
 
-            var value = sut.Value;
+            var value = sut.Value();
 
             Assert.Equal(1, value.ErrorRate.Count);
         }
@@ -197,14 +197,14 @@ namespace Quantify.Tests.Metrics
 
             using (sut.StartTiming())
             {
-                Assert.Equal(1, sut.Value.CurrentlyExecuting.Count);
+                Assert.Equal(1, sut.Value().CurrentlyExecuting.Count);
                 using (sut.StartTiming())
                 {
-                    Assert.Equal(2, sut.Value.CurrentlyExecuting.Count);
+                    Assert.Equal(2, sut.Value().CurrentlyExecuting.Count);
                 }
-                Assert.Equal(1, sut.Value.CurrentlyExecuting.Count);
+                Assert.Equal(1, sut.Value().CurrentlyExecuting.Count);
             }
-            Assert.Equal(0, sut.Value.CurrentlyExecuting.Count);
+            Assert.Equal(0, sut.Value().CurrentlyExecuting.Count);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Moq;
 using Quantify.Metrics;
 using Xunit;
 
@@ -13,7 +14,7 @@ namespace Quantify.Tests.Metrics
         public void CounterValueIsZeroInitially()
         {
             var sut = new Counter();
-            Assert.Equal(0L, sut.Value.Count);
+            Assert.Equal(0L, sut.Value().Count);
         }
 
         [Fact]
@@ -21,7 +22,7 @@ namespace Quantify.Tests.Metrics
         {
             var sut = new Counter();
             sut.Increment();
-            Assert.Equal(1L, sut.Value.Count);
+            Assert.Equal(1L, sut.Value().Count);
         }
 
         [Theory]
@@ -37,7 +38,7 @@ namespace Quantify.Tests.Metrics
                 sut.Increment();
             }
 
-            Assert.Equal(numIncrements, sut.Value.Count);
+            Assert.Equal(numIncrements, sut.Value().Count);
         }
 
         [Theory]
@@ -48,7 +49,7 @@ namespace Quantify.Tests.Metrics
         {
             var sut = new Counter();
             sut.Increment(value);
-            Assert.Equal(value, sut.Value.Count);
+            Assert.Equal(value, sut.Value().Count);
         }
 
         [Theory]
@@ -63,7 +64,7 @@ namespace Quantify.Tests.Metrics
                 sut.Increment(increment);
             }
 
-            Assert.Equal(expectedResult, sut.Value.Count);
+            Assert.Equal(expectedResult, sut.Value().Count);
         }
 
         [Fact]
@@ -72,7 +73,7 @@ namespace Quantify.Tests.Metrics
             var sut = new Counter();
             sut.Increment();
             sut.Decrement();
-            Assert.Equal(0L, sut.Value.Count);
+            Assert.Equal(0L, sut.Value().Count);
         }
 
         [Theory]
@@ -88,7 +89,7 @@ namespace Quantify.Tests.Metrics
                 sut.Decrement();
             }
 
-            Assert.Equal(expectedValue, sut.Value.Count);
+            Assert.Equal(expectedValue, sut.Value().Count);
         }
 
         [Theory]
@@ -99,7 +100,7 @@ namespace Quantify.Tests.Metrics
             var sut = new Counter();
             sut.Increment(initialValue);
             sut.Decrement(decrement);
-            Assert.Equal(expected, sut.Value.Count);
+            Assert.Equal(expected, sut.Value().Count);
         }
 
         [Theory]
@@ -115,7 +116,7 @@ namespace Quantify.Tests.Metrics
                 sut.Decrement(decrementValue);
             }
 
-            Assert.Equal(expectedValue, sut.Value.Count);
+            Assert.Equal(expectedValue, sut.Value().Count);
         }
     }
 }

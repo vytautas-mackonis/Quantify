@@ -46,7 +46,7 @@ namespace Quantify.Tests.Metrics
         {
             var sut = CreateHistogram(reservoirType, percentiles);
 
-            var value = sut.Value;
+            var value = sut.Value();
             Assert.Equal(0, value.Count);
             Assert.Equal(default(T), value.LastValue);
             Assert.Equal(default(T), value.Max);
@@ -74,7 +74,7 @@ namespace Quantify.Tests.Metrics
             var sample = ExampleValues[sampleIndex];
             sut.Mark(sample);
 
-            var value = sut.Value;
+            var value = sut.Value();
             Assert.Equal(1, value.Count);
             Assert.Equal(sample, value.LastValue);
             Assert.Equal(sample, value.Max);
@@ -105,7 +105,7 @@ namespace Quantify.Tests.Metrics
                 sut.Mark(sample);
             }
 
-            var value = sut.Value;
+            var value = sut.Value();
             Assert.Equal(10, value.Count);
             Assert.Equal(samples[samples.Length - 1], value.LastValue);
             Assert.Equal(samples.Max(), value.Max);

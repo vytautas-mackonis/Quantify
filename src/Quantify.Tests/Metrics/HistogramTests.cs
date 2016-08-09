@@ -30,7 +30,7 @@ namespace Quantify.Tests.Metrics
 
         private Histogram<T> CreateHistogram(ReservoirType reservoirType, double[] percentiles)
         {
-            return new Histogram<T>(CreateReservoir(reservoirType), percentiles);
+            return new Histogram<T>(CreateReservoir(reservoirType), percentiles.Select(x => (decimal)x).ToArray());
         }
 
         [Theory]
@@ -54,7 +54,7 @@ namespace Quantify.Tests.Metrics
             Assert.Equal(0.0, value.Mean);
             Assert.Equal(0.0, value.StdDev);
 
-            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>(x, default(T))).ToArray();
+            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>((decimal)x, default(T))).ToArray();
             Assert.Equal(expectedPercentiles, value.Percentiles);
         }
 
@@ -82,7 +82,7 @@ namespace Quantify.Tests.Metrics
             Assert.Equal(ToDouble(sample), value.Mean);
             Assert.Equal(0, value.StdDev);
 
-            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>(x, sample)).ToArray();
+            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>((decimal)x, sample)).ToArray();
             Assert.Equal(expectedPercentiles, value.Percentiles);
         }
 
@@ -116,7 +116,7 @@ namespace Quantify.Tests.Metrics
             var precision = 0.000000000001;
             Assert.InRange(value.StdDev, expectedStdDev - precision, expectedStdDev + precision);
 
-            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>(x, Statistics.Percentile(samples, x))).ToArray();
+            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>((decimal)x, Statistics.Percentile(samples, x))).ToArray();
             Assert.Equal(expectedPercentiles, value.Percentiles);
         }
 

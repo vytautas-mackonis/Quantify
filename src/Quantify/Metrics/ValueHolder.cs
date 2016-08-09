@@ -1,6 +1,6 @@
 ﻿namespace Quantify.Metrics
 {
-    public class ValueHolder<T>
+    internal class ValueHolder<T>
     {
         public T Value { get; }
 

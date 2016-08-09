@@ -9,7 +9,7 @@ namespace Quantify.Tests.Metrics
 {
     public class TimerExtensionsTests
     {
-        private readonly Timer _sut = new Timer(Clock.Default, new ExponentiallyDecayingReservoir<long>(), new double[0], new int[0]);
+        private readonly Timer _sut = new Timer(Clock.Default, new ExponentiallyDecayingReservoir<long>(), new decimal[0], new int[0]);
 
         [Fact]
         public void TimeCallsSuppliedActionWrappedInStartTiming()

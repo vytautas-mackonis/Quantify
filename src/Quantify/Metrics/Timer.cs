@@ -15,7 +15,7 @@ namespace Quantify.Metrics
         private readonly Histogram<long> _latencyHistogram;
         private readonly Counter _currentlyExecutingCounter;
 
-        public Timer(IClock clock, IReservoir<long> reservoir, double[] percentiles, int[] movingRateWindowSeconds)
+        public Timer(IClock clock, IReservoir<long> reservoir, decimal[] percentiles, int[] movingRateWindowSeconds)
         {
             _clock = clock;
             _rateMeter = new Meter(clock, movingRateWindowSeconds);
@@ -29,10 +29,7 @@ namespace Quantify.Metrics
             return new Context(this);
         }
 
-        public TimerValue Value
-            =>
-            new TimerValue(_rateMeter.Value, _errorRateMeter.Value, _latencyHistogram.Value,
-                _currentlyExecutingCounter.Value);
+        public TimerValue Value => new TimerValue(_rateMeter.Value, _errorRateMeter.Value, _latencyHistogram.Value, _currentlyExecutingCounter.Value);
 
         public interface IContext : IDisposable
         {

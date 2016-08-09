@@ -11,10 +11,10 @@ namespace Quantify.Metrics
         where T : struct, IComparable
     {
         private readonly IReservoir<T> _reservoir;
-        private readonly double[] _percentiles;
+        private readonly decimal[] _percentiles;
         private ValueHolder<T> _lastValue = new ValueHolder<T>(default(T));
 
-        public Histogram(IReservoir<T> reservoir, double[] percentiles)
+        public Histogram(IReservoir<T> reservoir, decimal[] percentiles)
         {
             _percentiles = percentiles;
             _reservoir = reservoir;
@@ -40,7 +40,7 @@ namespace Quantify.Metrics
         public double StdDev { get; }
         public PercentileValue<T>[] Percentiles { get; }
 
-        public HistogramValue(ISampleSet<T> sampleSet, T lastValue, double[] percentiles)
+        public HistogramValue(ISampleSet<T> sampleSet, T lastValue, decimal[] percentiles)
         {
             Count = sampleSet.Count;
             LastValue = lastValue;
@@ -49,7 +49,7 @@ namespace Quantify.Metrics
             Mean = sampleSet.Mean;
             StdDev = sampleSet.StdDev;
             Percentiles = percentiles
-                .Select(x => new PercentileValue<T>(x, sampleSet.GetPercentile(x)))
+                .Select(x => new PercentileValue<T>(x, sampleSet.GetPercentile((double)x)))
                 .ToArray();
         }
     }

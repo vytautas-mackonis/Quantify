@@ -3,10 +3,10 @@
     public struct PercentileValue<T>
         where T: struct 
     {
-        public double Quantile { get; }
+        public decimal Quantile { get; }
         public T Percentile { get; }
 
-        public PercentileValue(double quantile, T percentile)
+        public PercentileValue(decimal quantile, T percentile)
         {
             Quantile = quantile;
             Percentile = percentile;

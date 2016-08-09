@@ -11,8 +11,8 @@ namespace Quantify.Tests.Metrics
         [InlineData(0.7, 0.1)]
         public void DifferentQuantilesDoNotEqual(double quantile1, double quantile2)
         {
-            var left = new PercentileValue<T>(quantile1, default(T));
-            var right = new PercentileValue<T>(quantile2, default(T));
+            var left = new PercentileValue<T>((decimal)quantile1, default(T));
+            var right = new PercentileValue<T>((decimal)quantile2, default(T));
 
             Assert.NotEqual(left, right);
             Assert.NotEqual(right, left);
@@ -36,8 +36,8 @@ namespace Quantify.Tests.Metrics
         [InlineData(1, 0.8)]
         public void SameQuantilesAndPercentilesEqual(int index, double quantile)
         {
-            var left = new PercentileValue<T>(quantile, ExampleValues[index]);
-            var right = new PercentileValue<T>(quantile, ExampleValues[index]);
+            var left = new PercentileValue<T>((decimal)quantile, ExampleValues[index]);
+            var right = new PercentileValue<T>((decimal)quantile, ExampleValues[index]);
 
             Assert.Equal(left, right);
             Assert.Equal(right, left);

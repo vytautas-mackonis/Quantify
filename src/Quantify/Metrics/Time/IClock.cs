@@ -8,7 +8,7 @@ namespace Quantify.Metrics.Time
         long CurrentTimeNanoseconds();
     }
 
-    public class Clock
+    public static class Clock
     {
         public static readonly IClock Default = new StopwatchClock();
     }

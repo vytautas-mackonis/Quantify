@@ -73,10 +73,6 @@ namespace Quantify.Metrics.Sampling
 
         public long Count { get; }
 
-        public int Size => _values.Length;
-
-        public T[] Values => _values.ToArray();
-
         public T Max
         {
             get

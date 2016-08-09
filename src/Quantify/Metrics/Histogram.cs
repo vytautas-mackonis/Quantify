@@ -38,7 +38,6 @@ namespace Quantify.Metrics
         public T Min { get; }
         public double Mean { get; }
         public double StdDev { get; }
-        public int SampleSize { get; }
         public PercentileValue<T>[] Percentiles { get; }
 
         public HistogramValue(ISampleSet<T> sampleSet, T lastValue, double[] percentiles)
@@ -49,7 +48,6 @@ namespace Quantify.Metrics
             Min = sampleSet.Min;
             Mean = sampleSet.Mean;
             StdDev = sampleSet.StdDev;
-            SampleSize = sampleSet.Size;
             Percentiles = percentiles
                 .Select(x => new PercentileValue<T>(x, sampleSet.GetPercentile(x)))
                 .ToArray();

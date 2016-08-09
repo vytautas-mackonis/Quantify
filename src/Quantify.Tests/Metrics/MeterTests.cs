@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Quantify.Metrics;
@@ -113,21 +112,6 @@ namespace Quantify.Tests.Metrics
                 Assert.Equal(rateIntervals[i], rate.WindowSeconds);
                 Assert.InRange(rate.Rate, rates[i] - 0.001, rates[i] + 0.001);
             }
-        }
-    }
-
-    public class FakeClock : IClock
-    {
-        public long CurrentTime = DateTime.Now.Ticks * 100L;
-
-        public long CurrentTimeNanoseconds()
-        {
-            return CurrentTime;
-        }
-
-        public void AdvanceSeconds(int seconds)
-        {
-            CurrentTime += seconds*1000000000L;
         }
     }
 }

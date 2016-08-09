@@ -50,10 +50,6 @@ namespace Quantify.Metrics.Sampling
             return _values[index];
         }
 
-        public int Size => _values.Length;
-
-        public T[] Values => _values.ToArray();
-
         public T Max
         {
             get

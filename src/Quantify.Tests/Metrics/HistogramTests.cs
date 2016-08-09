@@ -53,7 +53,6 @@ namespace Quantify.Tests.Metrics
             Assert.Equal(default(T), value.Min);
             Assert.Equal(0.0, value.Mean);
             Assert.Equal(0.0, value.StdDev);
-            Assert.Equal(0, value.SampleSize);
 
             var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>(x, default(T))).ToArray();
             Assert.Equal(expectedPercentiles, value.Percentiles);
@@ -82,7 +81,6 @@ namespace Quantify.Tests.Metrics
             Assert.Equal(sample, value.Min);
             Assert.Equal(ToDouble(sample), value.Mean);
             Assert.Equal(0, value.StdDev);
-            Assert.Equal(1, value.SampleSize);
 
             var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>(x, sample)).ToArray();
             Assert.Equal(expectedPercentiles, value.Percentiles);
@@ -117,9 +115,8 @@ namespace Quantify.Tests.Metrics
             var expectedStdDev = StdDev(stdDevAlgorithm, samples);
             var precision = 0.000000000001;
             Assert.InRange(value.StdDev, expectedStdDev - precision, expectedStdDev + precision);
-            Assert.Equal(10, value.SampleSize);
 
-            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>(x, Percentile(samples, x))).ToArray();
+            var expectedPercentiles = percentiles.Select(x => new PercentileValue<T>(x, Statistics.Percentile(samples, x))).ToArray();
             Assert.Equal(expectedPercentiles, value.Percentiles);
         }
 
@@ -142,13 +139,6 @@ namespace Quantify.Tests.Metrics
                 default:
                     throw new ArgumentException("Unknown StdDev algorithm");
             }
-        }
-
-        private T Percentile(IEnumerable<T> tests, double quantile)
-        {
-            var ordered = tests.OrderBy(x => x).ToArray();
-            var take = (int)Math.Floor(ordered.Length*quantile) + 1;
-            return ordered.Take(take).LastOrDefault();
         }
     }
 
@@ -205,6 +195,14 @@ namespace Quantify.Tests.Metrics
             double mean = numberSet.Sum() / numberSet.Count;
 
             return Math.Sqrt(numberSet.Sum(x => Math.Pow(x - mean, 2)) / (numberSet.Count - 1));
+        }
+
+        public static T Percentile<T>(IEnumerable<T> tests, double quantile)
+            where T: IComparable
+        {
+            var ordered = tests.OrderBy(x => x).ToArray();
+            var take = (int)Math.Floor(ordered.Length * quantile) + 1;
+            return ordered.Take(take).LastOrDefault();
         }
     }
 

@@ -9,14 +9,14 @@ namespace Quantify.Metrics
     public class Gauge<T>
         where T: struct
     {
-        private volatile GaugeValue<T> _currentValue = new GaugeValue<T>(default(T));
+        private readonly Func<T> _valueAccessor;
 
-        public void Set(T value)
+        public Gauge(Func<T> valueAccessor)
         {
-            _currentValue = new GaugeValue<T>(value);
+            _valueAccessor = valueAccessor;
         }
 
-        public GaugeValue<T> Value => _currentValue;
+        public GaugeValue<T> Value => new GaugeValue<T>(_valueAccessor());
     }
 
     public class GaugeValue<T>

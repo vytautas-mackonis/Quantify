@@ -8,25 +8,32 @@ using Xunit;
 namespace Quantify.Tests.Metrics
 {
     public abstract class GaugeTests<T>
-        where T: struct 
+        where T: struct
     {
-        private readonly Gauge<T> _sut = new Gauge<T>();
+        private int _valueIndex = 0;
+        private readonly Gauge<T> _sut;
 
-        [Fact]
-        public void InitialGaugeValueIsZero()
+        public GaugeTests()
         {
-            Assert.Equal(default(T), _sut.Value.Value);
+             _sut = new Gauge<T>(() =>
+             {
+                 var result = ExampleValues[_valueIndex];
+                 _valueIndex++;
+                 return result;
+             });
         }
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(1)]
-        [InlineData(2)]
-        public void GaugeHoldsValueThatIsSet(int valueIndex)
+        [Fact]
+        public void GaugeReturnsValueFromSuppliedFunction()
         {
-            var value = ExampleValues[valueIndex];
-            _sut.Set(value);
-            Assert.Equal(value, _sut.Value.Value);
+            Assert.Equal(ExampleValues[0], _sut.Value.Value);
+        }
+
+        [Fact]
+        public void GaugeQueriesSuppliedFunctionEveryTime()
+        {
+            var unused = _sut.Value;
+            Assert.Equal(ExampleValues[1], _sut.Value.Value);
         }
 
         protected abstract T[] ExampleValues { get; }

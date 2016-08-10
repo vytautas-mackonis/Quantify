@@ -9,19 +9,21 @@ namespace Quantify.Metrics
 {
     public class Timer: IMetric
     {
+        private readonly string _name;
         private readonly IClock _clock;
         private readonly Meter _rateMeter;
         private readonly Meter _errorRateMeter;
         private readonly Histogram<long> _latencyHistogram;
         private readonly Counter _currentlyExecutingCounter;
 
-        public Timer(IClock clock, IReservoir<long> reservoir, decimal[] percentiles, int[] movingRateWindowSeconds)
+        public Timer(string name, IClock clock, IReservoir<long> reservoir, decimal[] percentiles, int[] movingRateWindowSeconds)
         {
+            _name = name;
             _clock = clock;
-            _rateMeter = new Meter(clock, movingRateWindowSeconds);
-            _errorRateMeter = new Meter(clock, movingRateWindowSeconds);
-            _latencyHistogram = new Histogram<long>(reservoir, percentiles);
-            _currentlyExecutingCounter = new Counter();
+            _rateMeter = new Meter("", clock, movingRateWindowSeconds);
+            _errorRateMeter = new Meter("", clock, movingRateWindowSeconds);
+            _latencyHistogram = new Histogram<long>("", reservoir, percentiles);
+            _currentlyExecutingCounter = new Counter("");
         }
 
         public IContext StartTiming()
@@ -71,7 +73,7 @@ namespace Quantify.Metrics
             _rateMeter.Accept(valueVisitor);
             _errorRateMeter.Accept(valueVisitor);
             _latencyHistogram.Accept(valueVisitor);
-            visitor.Visit(valueVisitor.Value);
+            visitor.Visit(_name, valueVisitor.Value);
         }
 
         private class TimerValueCollectingMetricVisitor : IMetricVisitor
@@ -82,26 +84,26 @@ namespace Quantify.Metrics
 
             public TimerValue Value => new TimerValue(_meters[0], _meters[1], _latency, _currentlyExecuting);
 
-            public void Visit(CounterValue metric)
+            public void Visit(string name, CounterValue metric)
             {
                 _currentlyExecuting = metric;
             }
 
-            public void Visit<T>(GaugeValue<T> metric) where T : struct
+            public void Visit<T>(string name, GaugeValue<T> metric) where T : struct
             {
             }
 
-            public void Visit<T>(HistogramValue<T> metric) where T : struct, IComparable
+            public void Visit<T>(string name, HistogramValue<T> metric) where T : struct, IComparable
             {
                 _latency = (HistogramValue<long>) (object) metric;
             }
 
-            public void Visit(MeterValue metric)
+            public void Visit(string name, MeterValue metric)
             {
                 _meters.Add(metric);
             }
 
-            public void Visit(TimerValue metric)
+            public void Visit(string name, TimerValue metric)
             {
             }
         }

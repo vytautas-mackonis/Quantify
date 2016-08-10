@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Moq;
 using Quantify.Metrics;
 using Xunit;
 
@@ -13,14 +12,14 @@ namespace Quantify.Tests.Metrics
         [Fact]
         public void CounterValueIsZeroInitially()
         {
-            var sut = new Counter();
+            var sut = new Counter("");
             Assert.Equal(0L, sut.Value().Count);
         }
 
         [Fact]
         public void CounterValueIsOneAfterSingleIncrement()
         {
-            var sut = new Counter();
+            var sut = new Counter("");
             sut.Increment();
             Assert.Equal(1L, sut.Value().Count);
         }
@@ -31,7 +30,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(4L)]
         public void CounterValueIsOneAfterMultipleIncrements(long numIncrements)
         {
-            var sut = new Counter();
+            var sut = new Counter("");
 
             for (var i = 0; i < numIncrements; i++)
             {
@@ -47,7 +46,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(4L)]
         public void CounterValueIsCorrectAfterSingleIncrementWithValue(long value)
         {
-            var sut = new Counter();
+            var sut = new Counter("");
             sut.Increment(value);
             Assert.Equal(value, sut.Value().Count);
         }
@@ -57,7 +56,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(3L, 4, 12L)]
         public void CounterValueIsCorrectAfterMultipleIncrementsWithValue(long increment, int numIncrements, long expectedResult)
         {
-            var sut = new Counter();
+            var sut = new Counter("");
 
             for (var i = 0; i < numIncrements; i++)
             {
@@ -70,7 +69,7 @@ namespace Quantify.Tests.Metrics
         [Fact]
         public void CounterValueIsCorrectlyDecrementedOnce()
         {
-            var sut = new Counter();
+            var sut = new Counter("");
             sut.Increment();
             sut.Decrement();
             Assert.Equal(0L, sut.Value().Count);
@@ -81,7 +80,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(15, 8, 7L)]
         public void CounterValueIsCorrectlyDecrementedMultipleTimes(int counterInitialValue, int timesDecremented, long expectedValue)
         {
-            var sut = new Counter();
+            var sut = new Counter("");
             sut.Increment(counterInitialValue);
 
             for (var i = 0; i < timesDecremented; i++)
@@ -97,7 +96,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(15, 8, 7L)]
         public void CounterValueIsCorrectlyDecrementedByValueOnce(int initialValue, int decrement, long expected)
         {
-            var sut = new Counter();
+            var sut = new Counter("");
             sut.Increment(initialValue);
             sut.Decrement(decrement);
             Assert.Equal(expected, sut.Value().Count);
@@ -108,7 +107,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(23, 8, 2, 7L)]
         public void CounterValueIsCorrectlyDecrementedByValueMultipleTimes(int counterInitialValue, int timesDecremented, int decrementValue, long expectedValue)
         {
-            var sut = new Counter();
+            var sut = new Counter("");
             sut.Increment(counterInitialValue);
 
             for (var i = 0; i < timesDecremented; i++)

@@ -14,6 +14,7 @@ namespace Quantify.Metrics
         private const long NanosecondsInSecond = 1000000000L;
         private const long TickInterval = TickSeconds * NanosecondsInSecond;
 
+        private readonly string _name;
         private readonly AtomicLong _count = new AtomicLong(0);
         private readonly long _startTime;
         private readonly AtomicLong _lastTick;
@@ -21,8 +22,9 @@ namespace Quantify.Metrics
 
         private readonly IDictionary<int, ExponentiallyWeightedMovingAverage> _movingAverages;
 
-        public Meter(IClock clock, int[] movingRateWindowSeconds)
+        public Meter(string name, IClock clock, int[] movingRateWindowSeconds)
         {
+            _name = name;
             _clock = clock;
             _startTime = _clock.CurrentTimeNanoseconds();
             _lastTick = new AtomicLong(_startTime);
@@ -84,7 +86,7 @@ namespace Quantify.Metrics
         {
             var rates = _movingAverages.Select(x => new RateValue(x.Key, x.Value.GetRate() * NanosecondsInSecond))
                 .ToArray();
-            visitor.Visit(new MeterValue(_count.Value, GetMeanRate(), rates));
+            visitor.Visit(_name, new MeterValue(_count.Value, GetMeanRate(), rates));
         }
     }
 

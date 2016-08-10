@@ -9,16 +9,18 @@ namespace Quantify.Metrics
     public class Gauge<T> : IMetric
         where T: struct
     {
+        private readonly string _name;
         private readonly Func<T> _valueAccessor;
 
-        public Gauge(Func<T> valueAccessor)
+        public Gauge(string name, Func<T> valueAccessor)
         {
+            _name = name;
             _valueAccessor = valueAccessor;
         }
 
         public void Accept(IMetricVisitor visitor)
         {
-            visitor.Visit(new GaugeValue<T>(_valueAccessor()));
+            visitor.Visit(_name, new GaugeValue<T>(_valueAccessor()));
         }
     }
 

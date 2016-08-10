@@ -30,7 +30,7 @@ namespace Quantify.Tests.Metrics
 
         private Histogram<T> CreateHistogram(ReservoirType reservoirType, double[] percentiles)
         {
-            return new Histogram<T>(CreateReservoir(reservoirType), percentiles.Select(x => (decimal)x).ToArray());
+            return new Histogram<T>("", CreateReservoir(reservoirType), percentiles.Select(x => (decimal)x).ToArray());
         }
 
         [Theory]

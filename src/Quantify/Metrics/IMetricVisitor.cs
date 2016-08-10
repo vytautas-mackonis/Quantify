@@ -4,12 +4,12 @@ namespace Quantify.Metrics
 {
     public interface IMetricVisitor
     {
-        void Visit(CounterValue metric);
-        void Visit<T>(GaugeValue<T> metric)
+        void Visit(string name, CounterValue metric);
+        void Visit<T>(string name, GaugeValue<T> metric)
             where T: struct;
-        void Visit<T>(HistogramValue<T> metric)
+        void Visit<T>(string name, HistogramValue<T> metric)
             where T : struct, IComparable;
-        void Visit(MeterValue metric);
-        void Visit(TimerValue metric);
+        void Visit(string name, MeterValue metric);
+        void Visit(string name, TimerValue metric);
     }
 }

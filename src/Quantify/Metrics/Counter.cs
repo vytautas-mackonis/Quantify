@@ -7,7 +7,13 @@ namespace Quantify.Metrics
 {
     public class Counter : IMetric
     {
+        private readonly string _name;
         private long _value = 0;
+
+        public Counter(string name)
+        {
+            _name = name;
+        }
 
         public void Increment()
         {
@@ -31,7 +37,7 @@ namespace Quantify.Metrics
 
         public void Accept(IMetricVisitor visitor)
         {
-            visitor.Visit(new CounterValue(Volatile.Read(ref _value)));
+            visitor.Visit(_name, new CounterValue(Volatile.Read(ref _value)));
         }
     }
 

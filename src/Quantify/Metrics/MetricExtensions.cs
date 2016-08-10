@@ -8,24 +8,24 @@ namespace Quantify.Metrics
         {
             public CounterValue Counter { get; private set; }
 
-            public void Visit(CounterValue metric)
+            public void Visit(string name, CounterValue metric)
             {
                 Counter = metric;
             }
 
-            public void Visit<U>(GaugeValue<U> metric) where U : struct
+            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
             {
             }
 
-            public void Visit<U>(HistogramValue<U> metric) where U : struct, IComparable
+            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
             }
 
-            public void Visit(MeterValue metric)
+            public void Visit(string name, MeterValue metric)
             { 
             }
 
-            public void Visit(TimerValue metric)
+            public void Visit(string name, TimerValue metric)
             {
             }
         }
@@ -35,25 +35,25 @@ namespace Quantify.Metrics
         {
             public GaugeValue<T> Gauge { get; private set; }
 
-            public void Visit(CounterValue metric)
+            public void Visit(string name, CounterValue metric)
             {
             }
 
-            public void Visit<U>(GaugeValue<U> metric) where U : struct
+            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
             {
                 if (typeof(T) == typeof(U))
                     Gauge = (GaugeValue<T>)(object)metric;
             }
 
-            public void Visit<U>(HistogramValue<U> metric) where U : struct, IComparable
+            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
             }
 
-            public void Visit(MeterValue metric)
+            public void Visit(string name, MeterValue metric)
             {
             }
 
-            public void Visit(TimerValue metric)
+            public void Visit(string name, TimerValue metric)
             {
             }
         }
@@ -63,25 +63,25 @@ namespace Quantify.Metrics
         {
             public HistogramValue<T> Histogram { get; private set; }
 
-            public void Visit(CounterValue metric)
+            public void Visit(string name, CounterValue metric)
             {
             }
 
-            public void Visit<U>(GaugeValue<U> metric) where U : struct
+            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
             {
             }
 
-            public void Visit<U>(HistogramValue<U> metric) where U : struct, IComparable
+            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
                 if (typeof(T) == typeof(U))
                     Histogram = (HistogramValue<T>)(object)metric;
             }
 
-            public void Visit(MeterValue metric)
+            public void Visit(string name, MeterValue metric)
             {
             }
 
-            public void Visit(TimerValue metric)
+            public void Visit(string name, TimerValue metric)
             {
             }
         }
@@ -90,49 +90,49 @@ namespace Quantify.Metrics
         {
             public MeterValue Meter { get; private set; }
 
-            public void Visit(CounterValue metric)
+            public void Visit(string name, CounterValue metric)
             {
             }
 
-            public void Visit<U>(GaugeValue<U> metric) where U : struct
+            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
             {
             }
 
-            public void Visit<U>(HistogramValue<U> metric) where U : struct, IComparable
+            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
             }
 
-            public void Visit(MeterValue metric)
+            public void Visit(string name, MeterValue metric)
             {
                 Meter = metric;
             }
 
-            public void Visit(TimerValue metric)
+            public void Visit(string name, TimerValue metric)
             {
             }
         }
 
-        public class CapturingTimerVisitor : IMetricVisitor
+        private class CapturingTimerVisitor : IMetricVisitor
         {
             public TimerValue Timer { get; private set; }
 
-            public void Visit(CounterValue metric)
+            public void Visit(string name, CounterValue metric)
             {
             }
 
-            public void Visit<U>(GaugeValue<U> metric) where U : struct
+            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
             {
             }
 
-            public void Visit<U>(HistogramValue<U> metric) where U : struct, IComparable
+            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
             }
 
-            public void Visit(MeterValue metric)
+            public void Visit(string name, MeterValue metric)
             {
             }
 
-            public void Visit(TimerValue metric)
+            public void Visit(string name, TimerValue metric)
             {
                 Timer = metric;
             }

@@ -12,7 +12,7 @@ namespace Quantify.IntegrationTests.ThreadSafety
     public class CounterTests
     {
         private const int NumThreads = 1000;
-        private readonly Counter _sut = new Counter();
+        private readonly Counter _sut = new Counter("");
 
         [Fact]
         public async Task NoParameterIncrementIsThreadSafe()
@@ -35,7 +35,7 @@ namespace Quantify.IntegrationTests.ThreadSafety
 
             await Task.WhenAll(tasks);
 
-            Assert.Equal(NumThreads * 5, _sut.Value.Count);
+            Assert.Equal(NumThreads * 5, _sut.Value().Count);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Quantify.IntegrationTests.ThreadSafety
 
             await Task.WhenAll(tasks);
 
-            Assert.Equal(NumThreads * 2 * 5, _sut.Value.Count); 
+            Assert.Equal(NumThreads * 2 * 5, _sut.Value().Count); 
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace Quantify.IntegrationTests.ThreadSafety
 
             await Task.WhenAll(tasks);
 
-            Assert.Equal(-NumThreads * 5, _sut.Value.Count);
+            Assert.Equal(-NumThreads * 5, _sut.Value().Count);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace Quantify.IntegrationTests.ThreadSafety
 
             await Task.WhenAll(tasks);
 
-            Assert.Equal(-NumThreads * 2 * 5, _sut.Value.Count);
+            Assert.Equal(-NumThreads * 2 * 5, _sut.Value().Count);
         }
     }
 }

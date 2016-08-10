@@ -18,7 +18,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(new[] { 10, 20 }, new[] { 0.5, 0.75 })]
         public void InitialTimerHasZeroValues(int[] movingRateDurations, double[] percentiles)
         {
-            var sut = new Timer(Clock.Default, new ExponentiallyDecayingReservoir<long>(), percentiles.Select(x => (decimal)x).ToArray(), movingRateDurations);
+            var sut = new Timer("", Clock.Default, new ExponentiallyDecayingReservoir<long>(), percentiles.Select(x => (decimal)x).ToArray(), movingRateDurations);
 
             var value = sut.Value();
             Assert.NotNull(value);
@@ -67,7 +67,7 @@ namespace Quantify.Tests.Metrics
         public void TimingWillUpdateLatencies(int[] timings, double[] percentiles)
         {
             var clock = new FakeClock();
-            var sut = new Timer(clock, new ExponentiallyDecayingReservoir<long>(), percentiles.Select(x => (decimal)x).ToArray(), new int[0]);
+            var sut = new Timer("", clock, new ExponentiallyDecayingReservoir<long>(), percentiles.Select(x => (decimal)x).ToArray(), new int[0]);
 
             foreach (var timing in timings)
             {
@@ -99,7 +99,7 @@ namespace Quantify.Tests.Metrics
         public void TimingWillUpdateRate(int[] movingRateDurations, int[] secondsBetweenTimes, double[] expectedMovingRates)
         {
             var clock = new FakeClock();
-            var sut = new Timer(clock, new ExponentiallyDecayingReservoir<long>(), new decimal[0], movingRateDurations);
+            var sut = new Timer("", clock, new ExponentiallyDecayingReservoir<long>(), new decimal[0], movingRateDurations);
 
             foreach (var seconds in secondsBetweenTimes)
             {
@@ -134,7 +134,7 @@ namespace Quantify.Tests.Metrics
         public void TimingWillUpdateErrorRate(int[] movingRateDurations, int[] secondsBetweenTimes, double[] expectedMovingRates)
         {
             var clock = new FakeClock();
-            var sut = new Timer(clock, new ExponentiallyDecayingReservoir<long>(), new decimal[0], movingRateDurations);
+            var sut = new Timer("", clock, new ExponentiallyDecayingReservoir<long>(), new decimal[0], movingRateDurations);
 
             foreach (var seconds in secondsBetweenTimes)
             {
@@ -166,7 +166,7 @@ namespace Quantify.Tests.Metrics
         [Fact]
         public void ErrorRateWillNotBeUpdatedWhenNotMarked()
         {
-            var sut = new Timer(Clock.Default, new ExponentiallyDecayingReservoir<long>(), new decimal[0], new int[0]);
+            var sut = new Timer("", Clock.Default, new ExponentiallyDecayingReservoir<long>(), new decimal[0], new int[0]);
             using (sut.StartTiming())
             {
             }
@@ -178,7 +178,7 @@ namespace Quantify.Tests.Metrics
         [Fact]
         public void ErrorRateWillOnlyBeUpdatedOnce()
         {
-            var sut = new Timer(new FakeClock(), new ExponentiallyDecayingReservoir<long>(), new decimal[0], new int[0]);
+            var sut = new Timer("", new FakeClock(), new ExponentiallyDecayingReservoir<long>(), new decimal[0], new int[0]);
             using (var context = sut.StartTiming())
             {
                 context.MarkError();
@@ -193,7 +193,7 @@ namespace Quantify.Tests.Metrics
         [Fact]
         public void TimingWillUpdateCurrentlyExecutingCounter()
         {
-            var sut = new Timer(Clock.Default, new ExponentiallyDecayingReservoir<long>(), new decimal[0], new int[0]);
+            var sut = new Timer("", Clock.Default, new ExponentiallyDecayingReservoir<long>(), new decimal[0], new int[0]);
 
             using (sut.StartTiming())
             {

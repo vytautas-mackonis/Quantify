@@ -15,7 +15,7 @@ namespace Quantify.Tests.Metrics
 
         public GaugeTests()
         {
-             _sut = new Gauge<T>(() =>
+             _sut = new Gauge<T>("", () =>
              {
                  var result = ExampleValues[_valueIndex];
                  _valueIndex++;

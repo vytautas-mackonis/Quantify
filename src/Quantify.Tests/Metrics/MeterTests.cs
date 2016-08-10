@@ -14,7 +14,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(new[] { 10, 15 })]
         public void InitialMeterHasZeroValues(int[] rates)
         {
-            var sut = new Meter(Clock.Default, rates);
+            var sut = new Meter("", Clock.Default, rates);
         
             var value = sut.Value();
         
@@ -30,7 +30,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(39)]
         public void MeterWithASingleValueHasCorrectCount(int count)
         {
-            var sut = new Meter(Clock.Default, new [] { 60 });
+            var sut = new Meter("", Clock.Default, new [] { 60 });
             sut.Mark(count);
         
             var value = sut.Value();
@@ -43,7 +43,7 @@ namespace Quantify.Tests.Metrics
         [InlineData(new[] { 11, 2, 18, 1 }, 32)]
         public void MeterWithMultipleValuesHasCorrectCount(int[] markValues, int expectedCount)
         {
-            var sut = new Meter(Clock.Default, new[] { 60 });
+            var sut = new Meter("", Clock.Default, new[] { 60 });
             foreach (var markValue in markValues)
             {
                 sut.Mark(markValue);
@@ -62,7 +62,7 @@ namespace Quantify.Tests.Metrics
         public void MeterWithASingleValueHasCorrectMeanRate(int count, int seconds, double mean)
         {
             var clock = new FakeClock();
-            var sut = new Meter(clock, new[] { 60 });
+            var sut = new Meter("", clock, new[] { 60 });
             clock.AdvanceSeconds(seconds);
             sut.Mark(count);
         
@@ -78,7 +78,7 @@ namespace Quantify.Tests.Metrics
         public void MeterWithAMultipleValuesHasCorrectMeanRate(int[] meterValues, int[] seconds, double mean)
         {
             var clock = new FakeClock();
-            var sut = new Meter(clock, new[] { 60 });
+            var sut = new Meter("", clock, new[] { 60 });
         
             for (var i = 0; i < meterValues.Length; i++)
             {
@@ -96,7 +96,7 @@ namespace Quantify.Tests.Metrics
         {
             var rateIntervals = new[] {60, 300, 900};
             var clock = new FakeClock();
-            var sut = new Meter(clock, rateIntervals);
+            var sut = new Meter("", clock, rateIntervals);
             sut.Mark();
             clock.AdvanceSeconds(10);
             sut.Mark(2);

@@ -10,12 +10,14 @@ namespace Quantify.Metrics
     public class Histogram<T> : IMetric
         where T : struct, IComparable
     {
+        private readonly string _name;
         private readonly IReservoir<T> _reservoir;
         private readonly decimal[] _percentiles;
         private ValueHolder<T> _lastValue = new ValueHolder<T>(default(T));
 
-        public Histogram(IReservoir<T> reservoir, decimal[] percentiles)
+        public Histogram(string name, IReservoir<T> reservoir, decimal[] percentiles)
         {
+            _name = name;
             _percentiles = percentiles;
             _reservoir = reservoir;
         }
@@ -28,7 +30,7 @@ namespace Quantify.Metrics
 
         public void Accept(IMetricVisitor visitor)
         {
-            visitor.Visit(new HistogramValue<T>(_reservoir.GetSamples(), _lastValue.Value, _percentiles));
+            visitor.Visit(_name, new HistogramValue<T>(_reservoir.GetSamples(), _lastValue.Value, _percentiles));
         }
     }
 

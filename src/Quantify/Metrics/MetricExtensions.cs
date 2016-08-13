@@ -174,5 +174,42 @@ namespace Quantify.Metrics
             metric.Accept(visitor);
             return visitor.Timer;
         }
+
+        private class NameCapturingMetricVisitor : IMetricVisitor
+        {
+            public string Name;
+
+            public void Visit(string name, CounterValue metric)
+            {
+                Name = name;
+            }
+
+            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
+            {
+                Name = name;
+            }
+
+            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
+            {
+                Name = name;
+            }
+
+            public void Visit(string name, MeterValue metric)
+            {
+                Name = name;
+            }
+
+            public void Visit(string name, TimerValue metric)
+            {
+                Name = name;
+            }
+        }
+
+        public static string Name(this IMetric metric)
+        {
+            var visitor = new NameCapturingMetricVisitor();
+            metric.Accept(visitor);
+            return visitor.Name;
+        }
     }
 }

@@ -64,5 +64,15 @@ namespace Quantify
         {
             return (Timer) Metrics.GetOrAdd(name, n => new Timer(n, Clock.Default, new ExponentiallyDecayingReservoir<long>(), new[] { 0.5m, 0.75m, 0.95m, 0.98m, 0.99m, 0.999m }, new[] { 60, 300, 900 }));
         }
+
+        public static IEnumerable<IMetric> ListMetrics()
+        {
+            return Metrics.Values;
+        }
+
+        public static void Reset()
+        {
+            Metrics.Clear();
+        }
     }
 }

@@ -87,7 +87,7 @@ namespace Quantify.Tests.Metrics
         }
 
         [Theory]
-        [InlineData(ReservoirType.ExponentiallyDecaying, StandardDeviationAlgorithm.Population, new[] { 0.5, 0.7 })]
+        [InlineData(ReservoirType.ExponentiallyDecaying, StandardDeviationAlgorithm.Population, new[] { 0.8 })]
         [InlineData(ReservoirType.ExponentiallyDecaying, StandardDeviationAlgorithm.Population, new[] { 0.4, 0.5, 0.9 })]
         [InlineData(ReservoirType.SlidingTimeWindow, StandardDeviationAlgorithm.Sample, new[] { 0.5, 0.7 })]
         [InlineData(ReservoirType.SlidingTimeWindow, StandardDeviationAlgorithm.Sample, new[] { 0.4, 0.5, 0.9 })]
@@ -110,7 +110,8 @@ namespace Quantify.Tests.Metrics
             Assert.Equal(samples[samples.Length - 1], value.LastValue);
             Assert.Equal(samples.Max(), value.Max);
             Assert.Equal(samples.Min(), value.Min);
-            Assert.Equal(samples.Select(ToDouble).Average(), value.Mean);
+            var expectedMean = samples.Select(ToDouble).Average();
+            Assert.InRange(value.Mean, expectedMean - 0.001, expectedMean + 0.001);
 
             var expectedStdDev = StdDev(stdDevAlgorithm, samples);
             var precision = 0.000000000001;

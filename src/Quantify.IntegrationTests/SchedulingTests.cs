@@ -97,7 +97,7 @@ namespace Quantify.IntegrationTests
         }
     }
 
-    public class CapturingMetricsReporter : IReporter
+    public class CapturingMetricsReporter : IMetricsReporter
     {
         public readonly ConcurrentQueue<IMetric[]> Snapshots = new ConcurrentQueue<IMetric[]>();
 
@@ -108,7 +108,7 @@ namespace Quantify.IntegrationTests
         }
     }
 
-    public class LongRunningCapturingMetricsReporter : IReporter
+    public class LongRunningCapturingMetricsReporter : IMetricsReporter
     {
         public readonly ConcurrentQueue<IMetric[]> Snapshots = new ConcurrentQueue<IMetric[]>();
         private readonly int _sleepMilliseconds;

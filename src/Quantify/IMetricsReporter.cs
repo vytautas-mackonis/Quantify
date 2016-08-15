@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Quantify
 {
-    public interface IReporter
+    public interface IMetricsReporter
     {
         Task Report(IEnumerable<IMetric> metrics);
     }

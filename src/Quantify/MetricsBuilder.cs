@@ -11,7 +11,7 @@ namespace Quantify
         private ISamplingReservoirFactory _reservoirFactory = new ExponentiallyDecayingReservoirFactory();
         private IClock _clock = new StopwatchClock();
 
-        public MetricsBuilder ReportUsing(IReporter reporter, int periodMilliseconds)
+        public MetricsBuilder ReportUsing(IMetricsReporter reporter, int periodMilliseconds)
         {
             _scheduler.Schedule(reporter, periodMilliseconds);
             return this;

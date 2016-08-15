@@ -7,7 +7,7 @@ namespace Quantify
     {
         private readonly List<PeriodicWorker> _workers = new List<PeriodicWorker>();
 
-        public void Schedule(IReporter reporter, int periodMilliseconds)
+        public void Schedule(IMetricsReporter reporter, int periodMilliseconds)
         {
             _workers.Add(new PeriodicWorker(periodMilliseconds, periodMilliseconds, () => reporter.Report(MetricsRegistry.ListMetrics())));
         }

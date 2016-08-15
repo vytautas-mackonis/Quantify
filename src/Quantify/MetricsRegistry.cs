@@ -3,9 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Quantify.Metrics;
-using Quantify.Metrics.Sampling;
-using Quantify.Metrics.Time;
+using Quantify.Sampling;
 
 namespace Quantify
 {
@@ -13,36 +11,49 @@ namespace Quantify
     {
         private static readonly ConcurrentDictionary<string, IMetric> Metrics = new ConcurrentDictionary<string, IMetric>();
 
+        private static T CreateMetric<T>(string name, Func<string, T> factory)
+            where T: IMetric
+        {
+            if (!MetricsConfiguration.Current.IsInitialized)
+                throw new MetricsConfigurationException("Must configure Quantify before creating any metrics. Please call Metrics.Configure() first, finishing with Run().");
+            return (T)Metrics.GetOrAdd(name, n => factory(n));
+        }
+
         public static Counter Counter(string name)
         {
-            return (Counter) Metrics.GetOrAdd(name, n => new Counter(n));
+            return CreateMetric(name, n => new Counter(n));
         }
 
         public static Gauge<int> Gauge(string name, Func<int> valueProvider)
         {
-            return (Gauge<int>) Metrics.GetOrAdd(name, n => new Gauge<int>(n, valueProvider));
+            return CreateMetric(name, n => new Gauge<int>(n, valueProvider));
         }
 
         public static Gauge<long> Gauge(string name, Func<long> valueProvider)
         {
-            return (Gauge<long>)Metrics.GetOrAdd(name, n => new Gauge<long>(n, valueProvider));
+            return CreateMetric(name, n => new Gauge<long>(n, valueProvider));
         }
 
         public static Gauge<double> Gauge(string name, Func<double> valueProvider)
         {
-            return (Gauge<double>)Metrics.GetOrAdd(name, n => new Gauge<double>(n, valueProvider));
+            return CreateMetric(name, n => new Gauge<double>(n, valueProvider));
         }
 
         public static Gauge<decimal> Gauge(string name, Func<decimal> valueProvider)
         {
-            return (Gauge<decimal>)Metrics.GetOrAdd(name, n => new Gauge<decimal>(n, valueProvider));
+            return CreateMetric(name, n => new Gauge<decimal>(n, valueProvider));
         }
 
         private static Histogram<T> CreateHistogram<T>(string name)
             where T : struct, IComparable
         {
 
-            return (Histogram<T>)Metrics.GetOrAdd(name, n => new Histogram<T>(n, new ExponentiallyDecayingReservoir<T>(), new[] { 0.5m, 0.75m, 0.95m, 0.98m, 0.99m, 0.999m }));
+            return CreateMetric(name, n => new Histogram<T>(
+                    n,
+                    MetricsConfiguration.Current.ReservoirFactory.Create<T>(MetricsConfiguration.Current.Clock),
+                    MetricsConfiguration.Current.Percentiles
+                )
+            );
         }
 
         public static Histogram<long> LongHistogram(string name)
@@ -57,22 +68,36 @@ namespace Quantify
 
         public static Meter Meter(string name)
         {
-            return (Meter) Metrics.GetOrAdd(name, n => new Meter(n, Clock.Default, new[] {60, 300, 900}));
+            return CreateMetric(name, n => new Meter(n, MetricsConfiguration.Current.Clock, MetricsConfiguration.Current.RateWindows));
         }
 
         public static Timer Timer(string name)
         {
-            return (Timer) Metrics.GetOrAdd(name, n => new Timer(n, Clock.Default, new ExponentiallyDecayingReservoir<long>(), new[] { 0.5m, 0.75m, 0.95m, 0.98m, 0.99m, 0.999m }, new[] { 60, 300, 900 }));
+            return CreateMetric(name, n => new Timer(
+                    n,
+                    MetricsConfiguration.Current.Clock,
+                    MetricsConfiguration.Current.ReservoirFactory.Create<long>(MetricsConfiguration.Current.Clock),
+                    MetricsConfiguration.Current.Percentiles,
+                    MetricsConfiguration.Current.RateWindows
+                )
+            );
         }
 
         public static IEnumerable<IMetric> ListMetrics()
         {
-            return Metrics.Values;
+            return Metrics.OrderBy(x => x.Key).Select(x => x.Value);
         }
 
-        public static void Reset()
+        internal static void Reset()
         {
             Metrics.Clear();
+        }
+    }
+
+    public class MetricsConfigurationException : Exception
+    {
+        public MetricsConfigurationException(string message) : base(message)
+        {
         }
     }
 }

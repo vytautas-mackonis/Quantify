@@ -1,5 +1,4 @@
 ﻿using System;
-using Quantify.Metrics.Time;
 
 namespace Quantify.Tests
 {

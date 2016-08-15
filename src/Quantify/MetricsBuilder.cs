@@ -43,9 +43,8 @@ namespace Quantify
 
         public IDisposable Run()
         {
-            MetricsConfiguration.InitializeWith(new MetricsConfiguration(_percentiles, _rateWindows, _reservoirFactory, _clock));
-            _scheduler.Start();
-            return new MetricsEngine(_scheduler);
+            return new MetricsEngine(_scheduler, new MetricsConfiguration(_percentiles, _rateWindows, _reservoirFactory, _clock))
+                .Start();
         }
     }
 }

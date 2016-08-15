@@ -11,12 +11,26 @@ namespace Quantify.Tests
 
         public GaugeTests()
         {
-             _sut = new Gauge<T>("", () =>
+             _sut = new Gauge<T>("foo", () =>
              {
                  var result = ExampleValues[_valueIndex];
                  _valueIndex++;
                  return result;
              });
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void InvalidNameThrows(string name)
+        {
+            Assert.Throws<ArgumentException>(() => new Gauge<T>(name, () => default(T)));
+        }
+
+        [Fact]
+        public void NullValueAccessorThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Gauge<T>("foo", null));
         }
 
         [Fact]

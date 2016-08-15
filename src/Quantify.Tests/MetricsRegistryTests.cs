@@ -3,6 +3,7 @@ using System.Linq;
 using Moq;
 using Xunit;
 using Quantify;
+using Quantify.Graphite;
 using Quantify.Sampling;
 
 namespace Quantify.Tests
@@ -26,6 +27,26 @@ namespace Quantify.Tests
             }
 
             Assert.Throws<MetricsConfigurationException>(() => MetricsRegistry.Counter("foo"));
+        }
+
+        [Fact]
+        public void CannotAddMetricOfTheSameNameWithDifferentType()
+        {
+            using (Metrics.Configure().Run())
+            {
+                MetricsRegistry.Counter("foo");
+                Assert.Throws<InvalidOperationException>(() => MetricsRegistry.Meter("foo"));
+            }
+        }
+
+        [Fact]
+        public void CannotAddMetricOfTheSameNameWithDifferentGenericType()
+        {
+            using (Metrics.Configure().Run())
+            {
+                MetricsRegistry.LongHistogram("foo");
+                Assert.Throws<InvalidOperationException>(() => MetricsRegistry.DoubleHistogram("foo"));
+            }
         }
 
         [Theory]
@@ -557,6 +578,65 @@ namespace Quantify.Tests
                 MetricsRegistry.Timer("foo");
                 Mock.Get(clock).VerifyAll();
             }
+        }
+
+        [Theory]
+        [InlineData(new[] { -1.0 })]
+        [InlineData(new[] { 0.0 })]
+        [InlineData(new[] { -0.0001 })]
+        [InlineData(new[] { 1.0001 })]
+        [InlineData(new[] { 0.5, 0.75, 1.1 })]
+        public void UsingInvalidQuantilesThrows(double[] quantiles)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Metrics.Configure().UsePercentiles(quantiles.Select(x => (decimal) x).ToArray()));
+        }
+
+        [Theory]
+        [InlineData(new[] { -1 })]
+        [InlineData(new[] { 0 })]
+        [InlineData(new[] { 10, -3, 15 })]
+        public void UsingInvalidQuantilesThrows(int[] rateWindows)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Metrics.Configure().UseRateWindows(rateWindows));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(-2)]
+        public void UsingInvalidReporterPeriodThrows(int period)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Metrics.Configure().ReportUsing(Mock.Of<IMetricsReporter>(), period));
+        }
+
+        [Fact]
+        public void UsingNullReporterThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => Metrics.Configure().ReportUsing(null, 1));
+        }
+
+        [Fact]
+        public void UsingNullPercentilesThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => Metrics.Configure().UsePercentiles(null));
+        }
+
+        [Fact]
+        public void UsingNullRateWindowsThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => Metrics.Configure().UseRateWindows(null));
+        }
+
+        [Fact]
+        public void UsingNullHistogramSamplingThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => Metrics.Configure().UseHistogramSampling(null));
+        }
+
+        [Fact]
+        public void UsingNullClockThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => Metrics.Configure().UseClock(null));
         }
 
         class FakeSampleSet<T> : ISampleSet<T>

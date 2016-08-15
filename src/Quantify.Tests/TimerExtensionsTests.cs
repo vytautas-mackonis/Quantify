@@ -7,7 +7,7 @@ namespace Quantify.Tests
 {
     public class TimerExtensionsTests
     {
-        private readonly Timer _sut = new Timer("", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
+        private readonly Timer _sut = new Timer("foo", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
 
         [Fact]
         public void TimeCallsSuppliedActionWrappedInStartTiming()

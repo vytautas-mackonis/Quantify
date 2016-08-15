@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Quantify
@@ -10,6 +11,8 @@ namespace Quantify
 
         public Counter(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException($"{nameof(name)} must be non-empty.");
             _name = name;
         }
 

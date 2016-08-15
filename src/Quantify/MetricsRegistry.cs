@@ -16,7 +16,10 @@ namespace Quantify
         {
             if (!MetricsConfiguration.Current.IsInitialized)
                 throw new MetricsConfigurationException("Must configure Quantify before creating any metrics. Please call Metrics.Configure() first, finishing with Run().");
-            return (T)Metrics.GetOrAdd(name, n => factory(n));
+            var existing = Metrics.GetOrAdd(name, n => factory(n));
+            if (!(existing is T))
+                throw new InvalidOperationException($"Unable to add {typeof(T).Name} with name {name}: a {existing.GetType().Name} with the same name already exists.");
+            return (T) existing;
         }
 
         public static Counter Counter(string name)

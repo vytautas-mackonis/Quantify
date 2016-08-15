@@ -18,6 +18,12 @@ namespace Quantify.Graphite
 
         public GraphiteConnection(string hostname, int port)
         {
+            if (string.IsNullOrEmpty(hostname))
+                throw new ArgumentException($"Invalid hostname.");
+
+            if (port <= 0 || port > 65535)
+                throw new ArgumentOutOfRangeException($"Invalid port.");
+
             _hostname = hostname;
             _port = port;
         }

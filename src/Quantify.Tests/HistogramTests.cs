@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using Quantify.Sampling;
 using Xunit;
 
@@ -28,7 +29,27 @@ namespace Quantify.Tests
 
         private Histogram<T> CreateHistogram(ReservoirType reservoirType, double[] percentiles)
         {
-            return new Histogram<T>("", CreateReservoir(reservoirType), percentiles.Select(x => (decimal)x).ToArray());
+            return new Histogram<T>("foo", CreateReservoir(reservoirType), percentiles.Select(x => (decimal)x).ToArray());
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void InvalidNameThrows(string name)
+        {
+            Assert.Throws<ArgumentException>(() => new Histogram<T>(name, Mock.Of<IReservoir<T>>(), new decimal[0]));
+        }
+
+        [Fact]
+        public void NullReservoirThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Histogram<T>("foo", null, new decimal[0]));
+        }
+
+        [Fact]
+        public void NullPercentilesThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Histogram<T>("foo", Mock.Of<IReservoir<T>>(), null));
         }
 
         [Theory]

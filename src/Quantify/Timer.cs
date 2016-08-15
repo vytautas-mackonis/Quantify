@@ -15,12 +15,23 @@ namespace Quantify
 
         public Timer(string name, IClock clock, IReservoir<long> reservoir, decimal[] percentiles, int[] movingRateWindowSeconds)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException($"{nameof(name)} must be non-empty.");
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+            if (reservoir == null)
+                throw new ArgumentNullException(nameof(reservoir));
+            if (percentiles == null)
+                throw new ArgumentNullException(nameof(percentiles));
+            if (movingRateWindowSeconds == null)
+                throw new ArgumentNullException(nameof(movingRateWindowSeconds));
+
             _name = name;
             _clock = clock;
-            _rateMeter = new Meter("", clock, movingRateWindowSeconds);
-            _errorRateMeter = new Meter("", clock, movingRateWindowSeconds);
-            _latencyHistogram = new Histogram<long>("", reservoir, percentiles);
-            _currentlyExecutingCounter = new Counter("");
+            _rateMeter = new Meter(name, clock, movingRateWindowSeconds);
+            _errorRateMeter = new Meter(name, clock, movingRateWindowSeconds);
+            _latencyHistogram = new Histogram<long>(name, reservoir, percentiles);
+            _currentlyExecutingCounter = new Counter(name);
         }
 
         public IContext StartTiming()

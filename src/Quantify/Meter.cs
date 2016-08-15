@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,15 @@ namespace Quantify
 
         public Meter(string name, IClock clock, int[] movingRateWindowSeconds)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException($"{nameof(name)} must be non-empty.");
+
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+
+            if (movingRateWindowSeconds == null)
+                throw new ArgumentNullException(nameof(movingRateWindowSeconds));
+
             _name = name;
             _clock = clock;
             _startTime = _clock.CurrentTimeNanoseconds();

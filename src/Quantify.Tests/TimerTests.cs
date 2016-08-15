@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Moq;
 using Quantify.Sampling;
 using Xunit;
 
@@ -7,12 +9,44 @@ namespace Quantify.Tests
     public class TimerTests
     {
         [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void InvalidNameThrows(string name)
+        {
+            Assert.Throws<ArgumentException>(() => new Timer(name, Mock.Of<IClock>(), Mock.Of<IReservoir<long>>(), new decimal[0], new int[0]));
+        }
+
+        [Fact]
+        public void NullClockThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Timer("foo", null, Mock.Of<IReservoir<long>>(), new decimal[0], new int[0]));
+        }
+
+        [Fact]
+        public void NullReservoirThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Timer("foo", Mock.Of<IClock>(),  null, new decimal[0], new int[0]));
+        }
+
+        [Fact]
+        public void NullPercentilesThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Timer("foo", Mock.Of<IClock>(), Mock.Of<IReservoir<long>>(), null, new int[0]));
+        }
+
+        [Fact]
+        public void NullMovingRatesThrows()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Timer("foo", Mock.Of<IClock>(), Mock.Of<IReservoir<long>>(), new decimal[0], null));
+        }
+
+        [Theory]
         [InlineData(new[] { 60, 300, 900 }, new[] { 0.5, 0.75 })]
         [InlineData(new[] { 60, 300, 900 }, new[] { 0.98, 0.99, 0.999 })]
         [InlineData(new[] { 10, 20 }, new[] { 0.5, 0.75 })]
         public void InitialTimerHasZeroValues(int[] movingRateDurations, double[] percentiles)
         {
-            var sut = new Timer("", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), percentiles.Select(x => (decimal)x).ToArray(), movingRateDurations);
+            var sut = new Timer("foo", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), percentiles.Select(x => (decimal)x).ToArray(), movingRateDurations);
 
             var value = sut.Value();
             Assert.NotNull(value);
@@ -61,7 +95,7 @@ namespace Quantify.Tests
         public void TimingWillUpdateLatencies(int[] timings, double[] percentiles)
         {
             var clock = new FakeClock();
-            var sut = new Timer("", clock, new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), percentiles.Select(x => (decimal)x).ToArray(), new int[0]);
+            var sut = new Timer("foo", clock, new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), percentiles.Select(x => (decimal)x).ToArray(), new int[0]);
 
             foreach (var timing in timings)
             {
@@ -93,7 +127,7 @@ namespace Quantify.Tests
         public void TimingWillUpdateRate(int[] movingRateDurations, int[] secondsBetweenTimes, double[] expectedMovingRates)
         {
             var clock = new FakeClock();
-            var sut = new Timer("", clock, new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], movingRateDurations);
+            var sut = new Timer("foo", clock, new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], movingRateDurations);
 
             foreach (var seconds in secondsBetweenTimes)
             {
@@ -128,7 +162,7 @@ namespace Quantify.Tests
         public void TimingWillUpdateErrorRate(int[] movingRateDurations, int[] secondsBetweenTimes, double[] expectedMovingRates)
         {
             var clock = new FakeClock();
-            var sut = new Timer("", clock, new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], movingRateDurations);
+            var sut = new Timer("foo", clock, new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], movingRateDurations);
 
             foreach (var seconds in secondsBetweenTimes)
             {
@@ -160,7 +194,7 @@ namespace Quantify.Tests
         [Fact]
         public void ErrorRateWillNotBeUpdatedWhenNotMarked()
         {
-            var sut = new Timer("", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
+            var sut = new Timer("foo", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
             using (sut.StartTiming())
             {
             }
@@ -172,7 +206,7 @@ namespace Quantify.Tests
         [Fact]
         public void ErrorRateWillOnlyBeUpdatedOnce()
         {
-            var sut = new Timer("", new FakeClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
+            var sut = new Timer("foo", new FakeClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
             using (var context = sut.StartTiming())
             {
                 context.MarkError();
@@ -187,7 +221,7 @@ namespace Quantify.Tests
         [Fact]
         public void TimingWillUpdateCurrentlyExecutingCounter()
         {
-            var sut = new Timer("", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
+            var sut = new Timer("foo", new StopwatchClock(), new ExponentiallyDecayingReservoir<long>(new StopwatchClock()), new decimal[0], new int[0]);
 
             using (sut.StartTiming())
             {

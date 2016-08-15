@@ -16,6 +16,15 @@ namespace Quantify
 
         public Histogram(string name, IReservoir<T> reservoir, decimal[] percentiles)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException($"{nameof(name)} must be non-empty.");
+
+            if (reservoir == null)
+                throw new ArgumentNullException(nameof(reservoir));
+
+            if (percentiles == null)
+                throw new ArgumentNullException(nameof(percentiles));
+
             _name = name;
             _percentiles = percentiles;
             _reservoir = reservoir;

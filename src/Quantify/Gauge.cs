@@ -11,6 +11,12 @@ namespace Quantify
 
         public Gauge(string name, Func<T> valueAccessor)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException($"{nameof(name)} must be non-empty.");
+
+            if (valueAccessor == null)
+                throw new ArgumentNullException(nameof(valueAccessor));
+
             _name = name;
             _valueAccessor = valueAccessor;
         }

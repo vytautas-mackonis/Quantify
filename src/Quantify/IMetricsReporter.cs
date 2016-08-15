@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Quantify
 {
-    public interface IMetricsReporter
+    public interface IMetricsReporter : IDisposable
     {
-        Task Report(IEnumerable<IMetric> metrics);
+        Task Report(IClock clock, IEnumerable<IMetric> metrics);
     }
 }

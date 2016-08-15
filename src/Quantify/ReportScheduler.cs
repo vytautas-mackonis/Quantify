@@ -6,10 +6,12 @@ namespace Quantify
     internal class ReportScheduler : IDisposable
     {
         private readonly List<PeriodicWorker> _workers = new List<PeriodicWorker>();
+        private readonly List<IMetricsReporter> _reporters = new List<IMetricsReporter>();
 
         public void Schedule(IMetricsReporter reporter, int periodMilliseconds)
         {
-            _workers.Add(new PeriodicWorker(periodMilliseconds, periodMilliseconds, () => reporter.Report(MetricsRegistry.ListMetrics())));
+            _reporters.Add(reporter);
+            _workers.Add(new PeriodicWorker(periodMilliseconds, periodMilliseconds, () => reporter.Report(MetricsConfiguration.Current.Clock, MetricsRegistry.ListMetrics())));
         }
 
         public void Start()
@@ -25,6 +27,11 @@ namespace Quantify
             foreach (var periodicWorker in _workers)
             {
                 periodicWorker.Dispose();
+            }
+
+            foreach (var metricsReporter in _reporters)
+            {
+                metricsReporter.Dispose();
             }
         }
     }

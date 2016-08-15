@@ -10,17 +10,21 @@ namespace Quantify
 
     public class StopwatchClock : IClock
     {
+        private const long UnixEraTicks = 621355968000000000L;
+
         public long CurrentTimeNanoseconds()
         {
-            return Stopwatch.GetTimestamp()*100L;
+            return (Stopwatch.GetTimestamp() - UnixEraTicks) * 100L;
         }
     }
 
     public class DateTimeClock : IClock
     {
+        private const long UnixEraTicks = 621355968000000000L;
+
         public long CurrentTimeNanoseconds()
         {
-            return DateTime.UtcNow.Ticks*100L;
+            return (DateTime.UtcNow.Ticks - UnixEraTicks) * 100L;
         }
     }
 }

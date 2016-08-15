@@ -1,9 +1,10 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Quantify.Tests
 {
     public abstract class GaugeTests<T>
-        where T: struct
+        where T: struct, IConvertible
     {
         private int _valueIndex = 0;
         private readonly Gauge<T> _sut;

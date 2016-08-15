@@ -7,7 +7,7 @@ using Xunit;
 namespace Quantify.Tests
 {
     public abstract class HistogramTests<T>
-        where T: struct, IComparable
+        where T: struct, IComparable, IConvertible
     {
         private static IReservoir<T> CreateReservoir(ReservoirType type)
         {

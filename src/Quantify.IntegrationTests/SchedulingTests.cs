@@ -11,9 +11,9 @@ namespace Quantify.IntegrationTests
     public class SchedulingTests
     {
         [Theory]
-        [InlineData(100, 2)]
-        [InlineData(100, 3)]
         [InlineData(200, 2)]
+        [InlineData(200, 3)]
+        [InlineData(400, 2)]
         public void MetricReportingIsScheduledAtInterval(int periodMilliseconds, int timesShouldBeCalled)
         {
             var reporter = new CapturingMetricsReporter();
@@ -22,9 +22,42 @@ namespace Quantify.IntegrationTests
                 .ReportUsing(reporter, periodMilliseconds)
                 .Run())
             {
-                Thread.Sleep((periodMilliseconds + 20) * timesShouldBeCalled);
+                Thread.Sleep((periodMilliseconds + 40) * timesShouldBeCalled);
                 Assert.Equal(timesShouldBeCalled, reporter.Snapshots.Count);
             }
+        }
+
+        [Fact]
+        public void CorrectClockIsSuppliedToReporters()
+        {
+            var clock = new StopwatchClock();
+            var reporter = new CapturingMetricsReporter();
+
+            using (Metrics.Configure()
+                .UseClock(clock)
+                .ReportUsing(reporter, 100)
+                .Run())
+            {
+                Thread.Sleep(120);
+                Assert.Same(clock, reporter.Clock);
+            }
+        }
+
+        [Fact]
+        public void ReporterIsDisposedWhenMetricsEngineIsDisposed()
+        {
+            var clock = new StopwatchClock();
+            var reporter = new CapturingMetricsReporter();
+
+            using (Metrics.Configure()
+                .UseClock(clock)
+                .ReportUsing(reporter, 100)
+                .Run())
+            {
+                Assert.False(reporter.Disposed);
+            }
+
+            Assert.True(reporter.Disposed);
         }
 
         [Fact]
@@ -100,11 +133,19 @@ namespace Quantify.IntegrationTests
     public class CapturingMetricsReporter : IMetricsReporter
     {
         public readonly ConcurrentQueue<IMetric[]> Snapshots = new ConcurrentQueue<IMetric[]>();
+        public IClock Clock;
+        public bool Disposed = false;
 
-        public Task Report(IEnumerable<IMetric> metrics)
+        public Task Report(IClock clock, IEnumerable<IMetric> metrics)
         {
+            Clock = clock;
             Snapshots.Enqueue(metrics.ToArray());
             return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            Disposed = true;
         }
     }
 
@@ -118,10 +159,14 @@ namespace Quantify.IntegrationTests
             _sleepMilliseconds = sleepMilliseconds;
         }
 
-        public async Task Report(IEnumerable<IMetric> metrics)
+        public async Task Report(IClock clock, IEnumerable<IMetric> metrics)
         {
             Snapshots.Enqueue(metrics.ToArray());
             await Task.Delay(_sleepMilliseconds).ConfigureAwait(false);
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

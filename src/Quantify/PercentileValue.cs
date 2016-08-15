@@ -1,7 +1,9 @@
-﻿namespace Quantify
+﻿using System;
+
+namespace Quantify
 {
     public struct PercentileValue<T>
-        where T: struct 
+        where T: struct, IConvertible
     {
         public decimal Quantile { get; }
         public T Percentile { get; }

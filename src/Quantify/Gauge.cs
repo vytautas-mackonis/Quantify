@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Quantify
 {
     public class Gauge<T> : IMetric
-        where T: struct
+        where T: struct, IConvertible
     {
         private readonly string _name;
         private readonly Func<T> _valueAccessor;

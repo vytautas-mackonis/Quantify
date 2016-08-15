@@ -1,9 +1,10 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Quantify.Tests
 {
     public abstract class PercentileValueTests<T>
-        where T : struct
+        where T : struct, IConvertible
     {
         [Theory]
         [InlineData(0.5, 0.54)]

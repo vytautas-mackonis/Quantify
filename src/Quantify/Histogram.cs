@@ -7,7 +7,7 @@ using Quantify.Sampling;
 namespace Quantify
 {
     public class Histogram<T> : IMetric
-        where T : struct, IComparable
+        where T : struct, IComparable, IConvertible
     {
         private readonly string _name;
         private readonly IReservoir<T> _reservoir;
@@ -36,7 +36,7 @@ namespace Quantify
     }
 
     public class HistogramValue<T>
-        where T: struct, IComparable
+        where T: struct, IComparable, IConvertible
     {
         public long Count { get; }
         public T LastValue { get; }

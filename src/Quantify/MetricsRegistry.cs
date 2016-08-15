@@ -45,7 +45,7 @@ namespace Quantify
         }
 
         private static Histogram<T> CreateHistogram<T>(string name)
-            where T : struct, IComparable
+            where T : struct, IComparable, IConvertible
         {
 
             return CreateMetric(name, n => new Histogram<T>(

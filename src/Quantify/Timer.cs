@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Quantify.Sampling;
 
@@ -64,46 +63,10 @@ namespace Quantify
             }
         }
 
-        public void Accept(IMetricVisitor visitor)
+        public async Task AcceptAsync(IMetricVisitor visitor)
         {
-            var valueVisitor = new TimerValueCollectingMetricVisitor();
-            _currentlyExecutingCounter.Accept(valueVisitor);
-            _rateMeter.Accept(valueVisitor);
-            _errorRateMeter.Accept(valueVisitor);
-            _latencyHistogram.Accept(valueVisitor);
-            visitor.Visit(_name, valueVisitor.Value);
-        }
-
-        private class TimerValueCollectingMetricVisitor : IMetricVisitor
-        {
-            private readonly List<MeterValue> _meters = new List<MeterValue>(2);
-            private HistogramValue<long> _latency;
-            private CounterValue _currentlyExecuting;
-
-            public TimerValue Value => new TimerValue(_meters[0], _meters[1], _latency, _currentlyExecuting);
-
-            public void Visit(string name, CounterValue metric)
-            {
-                _currentlyExecuting = metric;
-            }
-
-            public void Visit<T>(string name, GaugeValue<T> metric) where T : struct
-            {
-            }
-
-            public void Visit<T>(string name, HistogramValue<T> metric) where T : struct, IComparable
-            {
-                _latency = (HistogramValue<long>) (object) metric;
-            }
-
-            public void Visit(string name, MeterValue metric)
-            {
-                _meters.Add(metric);
-            }
-
-            public void Visit(string name, TimerValue metric)
-            {
-            }
+            var value = new TimerValue(_rateMeter.Value, _errorRateMeter.Value, _latencyHistogram.Value, _currentlyExecutingCounter.Value);
+            await visitor.VisitAsync(_name, value);
         }
     }
 

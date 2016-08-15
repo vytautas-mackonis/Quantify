@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Quantify.Sampling;
 
 namespace Quantify
@@ -26,9 +27,11 @@ namespace Quantify
             _reservoir.Mark(value);
         }
 
-        public void Accept(IMetricVisitor visitor)
+        internal HistogramValue<T> Value => new HistogramValue<T>(_reservoir.GetSamples(), _lastValue.Value, _percentiles);
+
+        public async Task AcceptAsync(IMetricVisitor visitor)
         {
-            visitor.Visit(_name, new HistogramValue<T>(_reservoir.GetSamples(), _lastValue.Value, _percentiles));
+            await visitor.VisitAsync(_name, Value);
         }
     }
 

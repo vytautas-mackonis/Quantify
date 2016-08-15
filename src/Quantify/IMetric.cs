@@ -1,7 +1,9 @@
-﻿namespace Quantify
+﻿using System.Threading.Tasks;
+
+namespace Quantify
 {
     public interface IMetric
     {
-        void Accept(IMetricVisitor visitor);
+        Task AcceptAsync(IMetricVisitor visitor);
     }
 }

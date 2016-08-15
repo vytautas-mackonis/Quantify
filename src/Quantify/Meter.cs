@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Quantify.Sampling;
 
 namespace Quantify
@@ -79,11 +80,11 @@ namespace Quantify
             }
         }
 
-        public void Accept(IMetricVisitor visitor)
+        internal MeterValue Value => new MeterValue(_count.Value, GetMeanRate(), _movingAverages.Select(x => new RateValue(x.Key, x.Value.GetRate() * NanosecondsInSecond)).ToArray());
+
+        public async Task AcceptAsync(IMetricVisitor visitor)
         {
-            var rates = _movingAverages.Select(x => new RateValue(x.Key, x.Value.GetRate() * NanosecondsInSecond))
-                .ToArray();
-            visitor.Visit(_name, new MeterValue(_count.Value, GetMeanRate(), rates));
+            await visitor.VisitAsync(_name, Value);
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Quantify
 {
@@ -32,9 +33,11 @@ namespace Quantify
             Interlocked.Add(ref _value, -value);
         }
 
-        public void Accept(IMetricVisitor visitor)
+        internal CounterValue Value => new CounterValue(Volatile.Read(ref _value));
+
+        public async Task AcceptAsync(IMetricVisitor visitor)
         {
-            visitor.Visit(_name, new CounterValue(Volatile.Read(ref _value)));
+            await visitor.VisitAsync(_name, Value);
         }
     }
 

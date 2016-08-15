@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Quantify
 {
@@ -8,25 +9,30 @@ namespace Quantify
         {
             public CounterValue Counter { get; private set; }
 
-            public void Visit(string name, CounterValue metric)
+            public Task VisitAsync(string name, CounterValue metric)
             {
                 Counter = metric;
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
+            public Task VisitAsync<U>(string name, GaugeValue<U> metric) where U : struct
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
+            public Task VisitAsync<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, MeterValue metric)
-            { 
-            }
-
-            public void Visit(string name, TimerValue metric)
+            public Task VisitAsync(string name, MeterValue metric)
             {
+                return Task.CompletedTask;
+            }
+
+            public Task VisitAsync(string name, TimerValue metric)
+            {
+                return Task.CompletedTask;
             }
         }
 
@@ -35,26 +41,31 @@ namespace Quantify
         {
             public GaugeValue<T> Gauge { get; private set; }
 
-            public void Visit(string name, CounterValue metric)
+            public Task VisitAsync(string name, CounterValue metric)
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
+            public Task VisitAsync<U>(string name, GaugeValue<U> metric) where U : struct
             {
                 if (typeof(T) == typeof(U))
                     Gauge = (GaugeValue<T>)(object)metric;
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
+            public Task VisitAsync<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, MeterValue metric)
+            public Task VisitAsync(string name, MeterValue metric)
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, TimerValue metric)
+            public Task VisitAsync(string name, TimerValue metric)
             {
+                return Task.CompletedTask;
             }
         }
 
@@ -63,26 +74,31 @@ namespace Quantify
         {
             public HistogramValue<T> Histogram { get; private set; }
 
-            public void Visit(string name, CounterValue metric)
+            public Task VisitAsync(string name, CounterValue metric)
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
+            public Task VisitAsync<U>(string name, GaugeValue<U> metric) where U : struct
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
+            public Task VisitAsync<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
                 if (typeof(T) == typeof(U))
                     Histogram = (HistogramValue<T>)(object)metric;
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, MeterValue metric)
+            public Task VisitAsync(string name, MeterValue metric)
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, TimerValue metric)
+            public Task VisitAsync(string name, TimerValue metric)
             {
+                return Task.CompletedTask;
             }
         }
 
@@ -90,25 +106,30 @@ namespace Quantify
         {
             public MeterValue Meter { get; private set; }
 
-            public void Visit(string name, CounterValue metric)
+            public Task VisitAsync(string name, CounterValue metric)
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
+            public Task VisitAsync<U>(string name, GaugeValue<U> metric) where U : struct
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
+            public Task VisitAsync<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, MeterValue metric)
+            public Task VisitAsync(string name, MeterValue metric)
             {
                 Meter = metric;
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, TimerValue metric)
+            public Task VisitAsync(string name, TimerValue metric)
             {
+                return Task.CompletedTask;
             }
         }
 
@@ -116,32 +137,37 @@ namespace Quantify
         {
             public TimerValue Timer { get; private set; }
 
-            public void Visit(string name, CounterValue metric)
+            public Task VisitAsync(string name, CounterValue metric)
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
+            public Task VisitAsync<U>(string name, GaugeValue<U> metric) where U : struct
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
+            public Task VisitAsync<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, MeterValue metric)
+            public Task VisitAsync(string name, MeterValue metric)
             {
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, TimerValue metric)
+            public Task VisitAsync(string name, TimerValue metric)
             {
                 Timer = metric;
+                return Task.CompletedTask;
             }
         }
 
         public static CounterValue Value(this Counter metric)
         {
             var visitor = new CapturingCounterVisitor();
-            metric.Accept(visitor);
+            metric.AcceptAsync(visitor);
             return visitor.Counter;
         }
 
@@ -149,7 +175,7 @@ namespace Quantify
             where T: struct 
         {
             var visitor = new CapturingGaugeVisitor<T>();
-            metric.Accept(visitor);
+            metric.AcceptAsync(visitor);
             return visitor.Gauge;
         }
 
@@ -157,21 +183,21 @@ namespace Quantify
             where T : struct, IComparable
         {
             var visitor = new CapturingHistogramVisitor<T>();
-            metric.Accept(visitor);
+            metric.AcceptAsync(visitor);
             return visitor.Histogram;
         }
 
         public static MeterValue Value(this Meter metric)
         {
             var visitor = new CapturingMeterVisitor();
-            metric.Accept(visitor);
+            metric.AcceptAsync(visitor);
             return visitor.Meter;
         }
 
         public static TimerValue Value(this Timer metric)
         {
             var visitor = new CapturingTimerVisitor();
-            metric.Accept(visitor);
+            metric.AcceptAsync(visitor);
             return visitor.Timer;
         }
 
@@ -179,36 +205,41 @@ namespace Quantify
         {
             public string Name;
 
-            public void Visit(string name, CounterValue metric)
+            public Task VisitAsync(string name, CounterValue metric)
             {
                 Name = name;
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, GaugeValue<U> metric) where U : struct
+            public Task VisitAsync<U>(string name, GaugeValue<U> metric) where U : struct
             {
                 Name = name;
+                return Task.CompletedTask;
             }
 
-            public void Visit<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
+            public Task VisitAsync<U>(string name, HistogramValue<U> metric) where U : struct, IComparable
             {
                 Name = name;
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, MeterValue metric)
+            public Task VisitAsync(string name, MeterValue metric)
             {
                 Name = name;
+                return Task.CompletedTask;
             }
 
-            public void Visit(string name, TimerValue metric)
+            public Task VisitAsync(string name, TimerValue metric)
             {
                 Name = name;
+                return Task.CompletedTask;
             }
         }
 
         public static string Name(this IMetric metric)
         {
             var visitor = new NameCapturingMetricVisitor();
-            metric.Accept(visitor);
+            metric.AcceptAsync(visitor);
             return visitor.Name;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Quantify
 {
@@ -14,9 +15,9 @@ namespace Quantify
             _valueAccessor = valueAccessor;
         }
 
-        public void Accept(IMetricVisitor visitor)
+        public async Task AcceptAsync(IMetricVisitor visitor)
         {
-            visitor.Visit(_name, new GaugeValue<T>(_valueAccessor()));
+            await visitor.VisitAsync(_name, new GaugeValue<T>(_valueAccessor()));
         }
     }
 

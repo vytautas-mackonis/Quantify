@@ -1,8 +1,12 @@
-﻿{
+{
   "version": "1.0.0-*",
-
+  "compilationOptions": {
+    "define": [ "LIBLOG_PORTABLE" ]
+  },
   "dependencies": {
-    "NETStandard.Library": "1.6.0"
+    "Microsoft.CSharp": "4.0.1",
+    "NETStandard.Library": "1.6.0",
+    "System.Dynamic.Runtime": "4.0.11"
   },
 
   "frameworks": {

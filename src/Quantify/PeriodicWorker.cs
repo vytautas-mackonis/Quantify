@@ -2,11 +2,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Quantify.Logging;
 
 namespace Quantify
 {
     internal class PeriodicWorker : IDisposable
     {
+        private static readonly ILog Log = LogProvider.GetLogger(typeof(PeriodicWorker));
+
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly int _delay;
         private readonly int _period;
@@ -37,8 +40,9 @@ namespace Quantify
                 {
                     await _work().ConfigureAwait(false);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Log.Error($"Error while executing periodic report: {ex}");
                 }
 
                 await Task.Delay(_period, _cancellationTokenSource.Token).ConfigureAwait(false);

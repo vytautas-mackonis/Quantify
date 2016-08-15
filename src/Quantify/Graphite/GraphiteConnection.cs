@@ -2,11 +2,14 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Quantify.Logging;
 
 namespace Quantify.Graphite
 {
     public class GraphiteConnection : IDisposable
     {
+        private static readonly ILog Log = LogProvider.GetLogger(typeof(GraphiteConnection));
+
         private readonly string _hostname;
         private readonly int _port;
         private TcpClient _client = null;
@@ -47,8 +50,9 @@ namespace Quantify.Graphite
 
                 await _stream.WriteAsync(_buffer, 0, bytesWritten + 1);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Error($"Failed to send data to graphite endpoint {_hostname}:{_port}: {ex}");
                 CloseConnection();
             }
         }
